@@ -1,5 +1,5 @@
-const mongoose = require("mongoose");
-// A
+import mongoose from 'mongoose';
+
 const orderSchema = new mongoose.Schema(
   {
     user: {
@@ -44,7 +44,7 @@ const orderSchema = new mongoose.Schema(
     },
     offer: { type: Number },
     productPictures: [
-        { img: { type: String } }
+      { img: { type: String } }
     ],
     orderStatus: [
       {
@@ -66,4 +66,4 @@ const orderSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("Order", orderSchema);
+export default mongoose.model("Order", orderSchema);

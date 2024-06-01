@@ -29,10 +29,10 @@ const userSchema = new mongoose.Schema({
     password: {
         type: String,
         required: true,
-        minLength: 6 // Assuming a minimum password length for security
+        minLength: 6 
     },
     phoneNumber: {
-        type: String, // Change from Number to String for better flexibility
+        type: String, 
         required: true
     },
     role: {

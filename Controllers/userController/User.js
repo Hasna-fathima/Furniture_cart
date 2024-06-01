@@ -1,12 +1,10 @@
-import usermodel from '../../Models/usermodel.js';
+import userModel from '../../Models/Usermodel.js'
 import bcryptjs from 'bcryptjs';
 import {generateToken} from '../../Utils/GenerateTokens.js'
 
 const saltRounds = 10;
 
 
-
-// Helper function to hash password
 const hashPassword = async (password) => {
     try {
         return await bcryptjs.hash(password, saltRounds);
@@ -20,7 +18,7 @@ export async function Signup(req, res) {
         console.log(req.body);
 
         const { firstname, lastname, username, email, password, phoneNumber } = req.body;
-        const userExist = await usermodel.findOne({ email });
+        const userExist = await userModel.findOne({ email });
         if (userExist) {
             return res.status(400).send("User already exists");
         }
@@ -28,7 +26,7 @@ export async function Signup(req, res) {
         const hashedPassword = await hashPassword(password);
         console.log("hashed password is", hashedPassword);
 
-        const newUser = new usermodel({ email, firstname, lastname, username, password: hashedPassword, phoneNumber });
+        const newUser = new userModel({ email, firstname, lastname, username, password: hashedPassword, phoneNumber });
         console.log('new user object', newUser);
         const newUserCreated = await newUser.save();
         console.log("new user is created", newUserCreated);
@@ -44,30 +42,33 @@ export async function Signup(req, res) {
     }
 };
 
+
 export async function Signin(req, res) {
     try {
         const { email, password } = req.body;
 
-        // Validate the input
         if (!email || !password) {
-            return res.status(400).send("Email and password are required");
+            return res.status(400).json({ message: "Email and password are required" });
         }
 
-        const userExist = await usermodel.findOne({ email });
+        const userExist = await User.findOne({ email });
         if (!userExist) {
-            return res.status(404).send("User does not exist");
+            return res.status(404).json({ message: "User does not exist" });
         }
 
         const matchPassword = await bcryptjs.compare(password, userExist.password);
         if (!matchPassword) {
-            return res.status(401).send("Incorrect password");
+            return res.status(401).json({ message: "Incorrect password" });
         }
-        var token = generateToken(userExist._id,userExist.role);
-        res.cookie(token,"token");
-        res.status(200).send("Login successful");
+
+        const token = generateToken(email);
+   
+        res.cookie('token',token);
+        res.status(200).json({ message: "Login successful", token }); 
 
     } catch (error) {
         console.log(error);
-        res.status(500).json("Server error");
+        res.status(500).json({ message: "Server error" });
     }
 };
+

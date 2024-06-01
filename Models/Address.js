@@ -1,6 +1,4 @@
-const mongoose = require("mongoose");
-
-// C
+import mongoose from 'mongoose'
 const addressSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -59,7 +57,7 @@ const addressSchema = new mongoose.Schema({
   },
 });
 
-// B
+
 const userAddressSchema = new mongoose.Schema(
   {
     user: {

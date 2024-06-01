@@ -3,16 +3,18 @@ import { connect } from '../config/db.js';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import userRouter from '../Routes/userRouter.js';
-//import { authenticateUser, authenticateAdmin } from '../Middleware/auth.js'; // Importing the middleware functions
+import adminRouter from '../Routes/Admin/adminRouter.js';
+import bodyParser from 'body-parser'
 
 const app = express();
-const port = 3000;
 
+const port = 3000;
 app.use(express.json());
 app.use(cors());
 app.use(cookieParser());
-//app.use(authenticateUser,authenticateAdmin); 
-app.use('/api/user', userRouter);
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use('/api/user',userRouter)
+app.use('/api/user/admin', adminRouter)
 
 connect()
   .then(() => {
