@@ -37,12 +37,16 @@ const productSchema = new mongoose.Schema({
         }
     ],
     category: { 
-        type: mongoose.Schema.Types.ObjectId, ref: 'Category', required: true 
+        type: mongoose.Schema.Types.ObjectId, ref: 'Category', required: true  
+             
     },
-    createdBy: { 
-        type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true 
-    },
+    imagePublicId:{
+        type:String,
+        require:true
+    }
+   
 
 }, { timestamps: true });
 
-module.exports = mongoose.model('Product', productSchema);
+const Product = mongoose.model('Product', productSchema);
+export default Product

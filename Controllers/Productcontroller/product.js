@@ -1,34 +1,42 @@
 import { cloudinaryInstance } from '../../config/Cloudinary.js';
-import Product from '../../Models/prodectmodel.js';
-import Category from '../../Models/Category.js';
+import Product from '../../Models/prodectmodel.js'
+
 
 // Function to upload image to Cloudinary
-export const uploadImageToCloudinary = async (filePath) => {
-  
+const uploadImageToCloudinary = async (filePath) => {
   try {
     console.log('Starting image upload:', filePath);
     const result = await cloudinaryInstance.uploader.upload(filePath, { folder: 'uploads' });
     console.log('Upload successful:', result);
-    return result.url;
+    
+    // Extract public_id from the Cloudinary response
+    const publicId = result.public_id;
+    console.log('Image Public ID:', publicId);
+
+    return publicId;
   } catch (error) {
     console.error('Error in uploading image to Cloudinary:', error);
-    throw error;
+    throw new Error('Failed to upload image to Cloudinary');
   }
 };
+
+
 
 // Function to create a new product
 export const createProduct = async (req, res) => {
   try {
-    const { name, slug, price, category, review, description, quantity, createdBy} = req.body;
+    const { name, slug, price, category, review, description, quantity } = req.body;
+
     // Ensure file is uploaded
     if (!req.file) {
       return res.status(400).json({ error: 'Image file is required' });
     }
     const imagePath = req.file.path;
-    console.log('Image path:', imagePath);
+    
+    // Upload image to Cloudinary and get the public_id
+    const publicId = await uploadImageToCloudinary(imagePath);
+    console.log('Upload process finished, public ID:', publicId);
 
-    const imageUrl = await uploadImageToCloudinary(imagePath);
-    console.log('Upload process finished, image URL:', imageUrl);
     // Create a new Product object
     const newProduct = new Product({
       name,
@@ -37,9 +45,9 @@ export const createProduct = async (req, res) => {
       category,
       review,
       description,
-      image:imageUrl,
+      image: req.file.path, // Use req.file.path if needed
       quantity,
-      createdBy: req.user._id
+      imagePublicId: publicId // Use the publicId obtained from Cloudinary
     });
     console.log('New product object:', newProduct);
 
@@ -58,7 +66,8 @@ export const createProduct = async (req, res) => {
 
 export const getAllProducts = async (req, res) => {
   try {
-    const products = await Product.find({});
+    const products = await Product.find();
+    console.log('')
     res.status(200).json(products);
   } catch (error) {
     console.error(error);
@@ -66,86 +75,112 @@ export const getAllProducts = async (req, res) => {
   }
 };
 
+
 export const updateProduct = async (req, res) => {
-  const { id } = req.params;
-  const { description, price, title } = req.body;
-
   try {
-    const updatedProduct = await Product.findByIdAndUpdate(
-      id,
-      { description, price, title },
-      { new: true }
-    );
+    // Access product ID from URL parameters
+    const { productId } = req.params;
 
-    if (!updatedProduct) {
+    // Access other form-data fields from req.body
+    const { name, description, price, slug, review, category, quantity } = req.body;
+
+    // Access uploaded image file (if any)
+    const uploadedImage = req.file;
+
+    // Find the product by ID
+    let product = await Product.findById(productId);
+
+    if (!product) {
       return res.status(404).json({ error: 'Product not found' });
     }
 
-    res.status(200).json(updatedProduct);
+    // Update product details based on the parsed form-data
+    product.name = name;
+    product.description = description;
+    product.price = price;
+    product.slug = slug;
+    product.review = review;
+    product.category = category;
+    product.quantity = quantity;
+
+    // Update image if an image file was uploaded
+    if (uploadedImage) {
+      const cloudinaryResult = await uploadImageToCloudinary(uploadedImage.path)
+      product.image=cloudinaryResult.secure_url // Assuming `path` contains the path to the uploaded image
+    }
+
+    // Save the updated product
+    await product.save();
+
+    res.json({ message: 'Product details and image updated successfully', product });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal server error' });
   }
-};
+}
+
 
 export const deleteProductById = async (req, res) => {
-  const { productId } = req.body;
+  const { productId } = req.params;
 
   if (!productId) {
     return res.status(400).json({ error: 'Product ID is required' });
   }
 
   try {
-    const result = await Product.deleteOne({ _id: productId });
-
-    if (!result.deletedCount) {
+    // Find the product to get the Cloudinary image ID
+    const product = await Product.findById(productId);
+    if (!product) {
       return res.status(404).json({ error: 'Product not found' });
     }
 
-    res.status(202).json({ message: 'Product deleted successfully' });
+    // Delete the image from Cloudinary
+    const imagePublicId = product.imagePublicId;
+    if (imagePublicId) {
+      const cloudinaryResult = await cloudinaryInstance.uploader.destroy(imagePublicId);
+      console.log('Cloudinary deletion result:', cloudinaryResult);
+    }
+
+    // Delete the product from the database
+    const result = await Product.deleteOne({ _id: productId });
+
+    if (result.deletedCount === 0) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+
+    res.status(200).json({ message: 'Product and image deleted successfully' });
   } catch (error) {
-    console.error(error);
+    console.error('Error deleting product:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 };
 
-export const getProductsBySlug = async (req, res) => {
-  const { slug } = req.params;
 
+
+export const getProductsByCategoryOrPrice = async (req, res) => {
   try {
-    const category = await Category.findOne({ slug }).select('_id type');
+    const category = req.query.category;
+    const price = req.query.price;
 
-    if (!category) {
-      return res.status(404).json({ error: 'Category not found' });
+    let query = {};
+
+    if (category && !price) {
+      query.category = category;
     }
 
-    const products = await Product.find({ category: category._id });
-
-    if (category.type) {
-      const priceRanges = {
-        under5k: 5000,
-        under10k: 10000,
-        under15k: 15000,
-        under20k: 20000,
-        under30k: 30000,
-      };
-
-      const productsByPrice = {
-        under5k: products.filter(product => product.price <= 5000),
-        under10k: products.filter(product => product.price > 5000 && product.price <= 10000),
-        under15k: products.filter(product => product.price > 10000 && product.price <= 15000),
-        under20k: products.filter(product => product.price > 15000 && product.price <= 20000),
-        under30k: products.filter(product => product.price > 20000 && product.price <= 30000),
-      };
-
-      return res.status(200).json({ products, priceRanges, productsByPrice });
-    } else {
-      return res.status(200).json({ products });
+    if (!category && price) {
+      query.price = price;
     }
+
+    const products = await Product.find(query);
+
+    if (!products || products.length === 0) {
+      return res.status(404).json({ error: 'Products not found' });
+    }
+
+    res.json(products);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal server error' });
   }
 };
-
-

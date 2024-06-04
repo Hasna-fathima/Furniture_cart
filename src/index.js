@@ -2,9 +2,12 @@ import express from 'express';
 import { connect } from '../config/db.js';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
-import userRouter from '../Routes/userRouter.js';
+import userRouter from '../Routes/user/userRouter.js'
 import adminRouter from '../Routes/Admin/adminRouter.js';
-import bodyParser from 'body-parser'
+import bodyParser from 'body-parser';
+import dotenv from 'dotenv'
+
+dotenv.config()
 
 const app = express();
 

@@ -1,5 +1,5 @@
-import bcryptjs from 'bcryptjs'
-import { adminToken } from '../../Utils/GenerateTokens'
+
+import Category from "../../Models/Category"
 
 
 export const Createcategory=async(req,res)=>{
@@ -18,7 +18,7 @@ export const Createcategory=async(req,res)=>{
         const imgurl=result.url;
         const{name,slug,parentId,createdBy,type}=req.body
         
-        const Createcategory=new category({
+        const Createcategory=new Category({
           name,
           slug,
           image:imgurl,
@@ -39,12 +39,10 @@ export const Createcategory=async(req,res)=>{
         return res.status(500).json({ error: 'Internal server error' });
       }
     }
-
-
     
 export const getAllcategory=async(req,res)=>{
   try {
-      const categorys = await coursemodel.find({});
+      const categorys = await Category.find({});
       if (!categorys) {
         return res.status(404).json({ error: 'categorys are not found' });
       }
@@ -60,7 +58,7 @@ export const getAllcategory=async(req,res)=>{
     const id=req.params.id;
   
     try {
-      const category = await coursemodel.findoneAndUpdate({id:_id},{description,price,title,}, { new: true }
+      const category = await Category.findoneAndUpdate({id:_id},{description,price,title,}, { new: true }
       );
       if (!category) {
         return res.status(404).json({ error: 'category is not updated' });

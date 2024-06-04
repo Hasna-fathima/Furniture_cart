@@ -39,6 +39,8 @@ export async function Signup(req, res) {
     }
 }
 
+
+
 export const Signin = async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -57,7 +59,8 @@ export const Signin = async (req, res) => {
             return res.status(400).json({ message: "Invalid password" });
         }
 
-       const token=adminToken(email)
+        // Pass the entire admin object to adminToken function
+        const token = adminToken(admin);
        
         res.cookie("token" , token, { httpOnly: true, maxAge: 86400000 });
 
@@ -65,15 +68,17 @@ export const Signin = async (req, res) => {
         return res.status(200).json({
             token,
             user: { _id, username, email: adminEmail, role },
-            
         });
-        
 
     } catch (error) {
         console.error(error);
         return res.status(500).json({ message: "Something went wrong", error: error.message });
     }
 };
+
+
+
+
 
 
 export const Signout=(req, res)=> {

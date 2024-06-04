@@ -16,12 +16,13 @@ export const generateToken = (user) => {
 };
 
 
+
 export const adminToken = (admin) => {
-   
     const token = jwt.sign(
-        { _id: admin._id, role: admin.role },
-        process.env.SECRET_KEY,
-        { expiresIn:"1d" }
+        { _id: admin._id, role: admin.role }, 
+        process.env.SECRET_KEY, 
+        { expiresIn: "1d" }
     );
-  return token
+    console.log("Generated Token:", token); // Log generated token
+    return token;
 };
