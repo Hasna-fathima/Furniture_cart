@@ -16,14 +16,14 @@ export const Createcategory=async(req,res)=>{
                 })
               }
         const imgurl=result.url;
-        const{name,slug,parentId,createdBy,type}=req.body
+        const{name,slug,parentId,createdBy}=req.body
         
         const Createcategory=new Category({
           name,
           slug,
           image:imgurl,
           parentId,
-          createdBy:req.user._id,
+          createdBy:req.admin._id,
 
         })
        

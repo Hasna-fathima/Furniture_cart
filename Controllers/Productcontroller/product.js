@@ -3,7 +3,7 @@ import Product from '../../Models/prodectmodel.js'
 
 
 // Function to upload image to Cloudinary
-const uploadImageToCloudinary = async (filePath) => {
+ const uploadImageToCloudinary = async (filePath) => {
   try {
     console.log('Starting image upload:', filePath);
     const result = await cloudinaryInstance.uploader.upload(filePath, { folder: 'uploads' });
@@ -23,7 +23,7 @@ const uploadImageToCloudinary = async (filePath) => {
 
 
 // Function to create a new product
-export const createProduct = async (req, res) => {
+ const createProduct = async (req, res) => {
   try {
     const { name, slug, price, category, review, description, quantity } = req.body;
 
@@ -64,7 +64,7 @@ export const createProduct = async (req, res) => {
 
 
 
-export const getAllProducts = async (req, res) => {
+const getAllProducts = async (req, res) => {
   try {
     const products = await Product.find();
     console.log('')
@@ -76,7 +76,7 @@ export const getAllProducts = async (req, res) => {
 };
 
 
-export const updateProduct = async (req, res) => {
+const updateProduct = async (req, res) => {
   try {
     // Access product ID from URL parameters
     const { productId } = req.params;
@@ -120,7 +120,7 @@ export const updateProduct = async (req, res) => {
 }
 
 
-export const deleteProductById = async (req, res) => {
+ const deleteProductById = async (req, res) => {
   const { productId } = req.params;
 
   if (!productId) {
@@ -157,7 +157,7 @@ export const deleteProductById = async (req, res) => {
 
 
 
-export const getProductsByCategoryOrPrice = async (req, res) => {
+ const getProductsByCategoryOrPrice = async (req, res) => {
   try {
     const category = req.query.category;
     const price = req.query.price;
@@ -184,3 +184,6 @@ export const getProductsByCategoryOrPrice = async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 };
+
+const productController={createProduct,getAllProducts,updateProduct,deleteProductById,getProductsByCategoryOrPrice}
+export default productController;

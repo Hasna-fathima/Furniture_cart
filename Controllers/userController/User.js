@@ -43,32 +43,36 @@ export async function Signup(req, res) {
 };
 
 
+
 export async function Signin(req, res) {
     try {
         const { email, password } = req.body;
-
-        if (!email || !password) {
-            return res.status(400).json({ message: "Email and password are required" });
-        }
-
-        const userExist = await User.findOne({ email });
+        const userExist = await userModel.findOne({ email });
         if (!userExist) {
-            return res.status(404).json({ message: "User does not exist" });
+            return res.json("User does not exist");
         }
 
         const matchPassword = await bcryptjs.compare(password, userExist.password);
         if (!matchPassword) {
-            return res.status(401).json({ message: "Incorrect password" });
+            return res.json("Password is not correct");
         }
 
-        const token = generateToken(email);
-   
-        res.cookie('token',token);
-        res.status(200).json({ message: "Login successful", token }); 
-
+        var token = generateToken(email);
+        res.cookie("token",token);
+        res.json("login sucessfull");
+        return token
     } catch (error) {
         console.log(error);
-        res.status(500).json({ message: "Server error" });
+        res.status(500).json("Server error");
     }
-};
+}
 
+
+
+
+
+export const Signout=(req, res)=> {
+    res.clearCookie(token)
+    res.status(200).json("signout  Scuccessfully...")
+   
+    }

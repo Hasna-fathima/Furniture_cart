@@ -1,6 +1,7 @@
 import express from 'express';
 import { Signup, Signin,Signout} from '../../Controllers/admin/adminController.js';
-import { createProduct,getAllProducts,getProductsByCategoryOrPrice, updateProduct ,deleteProductById} from '../../Controllers/Productcontroller/product.js';
+import productController from '../../Controllers/Productcontroller/product.js';
+import Offers from '../../Controllers/admin/offerController/offer.js';
 import {upload} from '../../Middleware/upload.js';
 import { requireSignin,authenticateAdmin } from '../../Middleware/auth.js';
 
@@ -10,22 +11,32 @@ const adminRouter = express.Router();
 adminRouter.post('/signup', Signup);
 adminRouter.post('/signin', Signin);
 adminRouter.post('/signout',requireSignin,Signout);
+adminRouter.get('/getdashboard',getdashboard);
 
 
                      //-----------product Controll-----------//
 
 
-adminRouter.post('/create-product',upload.single('image'),authenticateAdmin, requireSignin,createProduct);
-adminRouter.get('/product',requireSignin,getProductsByCategoryOrPrice);
-adminRouter.get('/products',requireSignin,getAllProducts);
-adminRouter.put('/product/:productId',upload.single('image'),requireSignin,authenticateAdmin, updateProduct)
-adminRouter.delete('/productdelete/:productId',requireSignin,authenticateAdmin,deleteProductById);
+adminRouter.post('/create-product',upload.single('image'),authenticateAdmin, requireSignin,productController.createProduct); adminRouter.get('/product',requireSignin,productController.getProductsByCategoryOrPrice);
+adminRouter.get('/products',productController.getAllProducts);
+adminRouter.put('/product/:productId',upload.single('image'),requireSignin,authenticateAdmin,productController.updateProduct)
+adminRouter.delete('/productdelete/:productId',requireSignin,authenticateAdmin,productController.deleteProductById);
+                
 
 
-                    // -------------Category Control----------//
+                     //--------user manage----------------//
+
+adminRouter.get('/getalluser',getAllusers);
+adminRouter.get('/getuser',getuserbyId);
+adminRouter.get('/blockuser',blockedusers);
+adminRouter.get('/unblockusers',unblockedusers)
 
 
-adminRouter.get('/category',requireSignin,authenticateAdmin,getCategory)
+
+                   // -------------Category Control----------//
+
+
+ adminRouter.get('/category',requireSignin,authenticateAdmin,getCategory)
 adminRouter.post('/addCate',requireSignin,authenticateAdmin,AddCategory)
 adminRouter.get('/editCate/:id',requireSignin,authenticateAdmin,getEditCate)
 adminRouter.post('/editCate/:id',requireSignin,authenticateAdmin,EditCate)
@@ -63,6 +74,14 @@ adminRouter.post('/salesreport',requireSignin,authenticateAdmin,dashboard.downlo
  adminRouter.get('/banner',getBanner)
  adminRouter.get('/addbannerpage',getAddBanner)
  adminRouter.post('/addbanner',postAddBanner)
+
+                       //------0ffer---------//
+
+adminRouter.get('/offers',Offers.getAlloffers);
+adminRouter.get('/offers/:Id',Offers.getOfferbyId)
+adminRouter.post('/offers',Offers.createoffers)
+adminRouter.put('/offers/:Id',Offers.editOfferbyId)
+adminRouter.delete('/offers/:Id',Offers.deleteOffer)
 
 
 
