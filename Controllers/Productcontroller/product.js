@@ -2,14 +2,12 @@ import { cloudinaryInstance } from '../../config/Cloudinary.js';
 import Product from '../../Models/prodectmodel.js'
 
 
-// Function to upload image to Cloudinary
  const uploadImageToCloudinary = async (filePath) => {
   try {
     console.log('Starting image upload:', filePath);
     const result = await cloudinaryInstance.uploader.upload(filePath, { folder: 'uploads' });
     console.log('Upload successful:', result);
     
-    // Extract public_id from the Cloudinary response
     const publicId = result.public_id;
     console.log('Image Public ID:', publicId);
 
@@ -22,22 +20,24 @@ import Product from '../../Models/prodectmodel.js'
 
 
 
-// Function to create a new product
+
+
+
+
  const createProduct = async (req, res) => {
   try {
     const { name, slug, price, category, review, description, quantity } = req.body;
 
-    // Ensure file is uploaded
+    
     if (!req.file) {
       return res.status(400).json({ error: 'Image file is required' });
     }
     const imagePath = req.file.path;
     
-    // Upload image to Cloudinary and get the public_id
+    
     const publicId = await uploadImageToCloudinary(imagePath);
     console.log('Upload process finished, public ID:', publicId);
 
-    // Create a new Product object
     const newProduct = new Product({
       name,
       slug,
@@ -45,13 +45,11 @@ import Product from '../../Models/prodectmodel.js'
       category,
       review,
       description,
-      image: req.file.path, // Use req.file.path if needed
+      image: req.file.path, 
       quantity,
-      imagePublicId: publicId // Use the publicId obtained from Cloudinary
+      imagePublicId: publicId 
     });
     console.log('New product object:', newProduct);
-
-    // Save the new product to the database
     const savedProduct = await newProduct.save();
     console.log('New product created:', savedProduct);
 
@@ -64,10 +62,13 @@ import Product from '../../Models/prodectmodel.js'
 
 
 
+
+
+
 const getAllProducts = async (req, res) => {
   try {
     const products = await Product.find();
-    console.log('')
+    console.log('products',products)
     res.status(200).json(products);
   } catch (error) {
     console.error(error);
@@ -78,23 +79,14 @@ const getAllProducts = async (req, res) => {
 
 const updateProduct = async (req, res) => {
   try {
-    // Access product ID from URL parameters
+
     const { productId } = req.params;
-
-    // Access other form-data fields from req.body
     const { name, description, price, slug, review, category, quantity } = req.body;
-
-    // Access uploaded image file (if any)
     const uploadedImage = req.file;
-
-    // Find the product by ID
     let product = await Product.findById(productId);
-
     if (!product) {
       return res.status(404).json({ error: 'Product not found' });
     }
-
-    // Update product details based on the parsed form-data
     product.name = name;
     product.description = description;
     product.price = price;
@@ -102,14 +94,12 @@ const updateProduct = async (req, res) => {
     product.review = review;
     product.category = category;
     product.quantity = quantity;
-
-    // Update image if an image file was uploaded
+    
     if (uploadedImage) {
       const cloudinaryResult = await uploadImageToCloudinary(uploadedImage.path)
-      product.image=cloudinaryResult.secure_url // Assuming `path` contains the path to the uploaded image
+      product.image=cloudinaryResult.secure_url 
     }
 
-    // Save the updated product
     await product.save();
 
     res.json({ message: 'Product details and image updated successfully', product });
@@ -128,20 +118,16 @@ const updateProduct = async (req, res) => {
   }
 
   try {
-    // Find the product to get the Cloudinary image ID
+  
     const product = await Product.findById(productId);
     if (!product) {
       return res.status(404).json({ error: 'Product not found' });
     }
-
-    // Delete the image from Cloudinary
     const imagePublicId = product.imagePublicId;
     if (imagePublicId) {
       const cloudinaryResult = await cloudinaryInstance.uploader.destroy(imagePublicId);
       console.log('Cloudinary deletion result:', cloudinaryResult);
     }
-
-    // Delete the product from the database
     const result = await Product.deleteOne({ _id: productId });
 
     if (result.deletedCount === 0) {
@@ -154,6 +140,35 @@ const updateProduct = async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 };
+
+
+const getProductById=async(req,res)=>{
+  const  {Id} =req.params
+    try {
+        const product = await Product.findById(Id);
+        if (!product) {
+            return res.status(404).send('product not found');
+        }
+        res.status(200).send(product);
+    } catch (err) {
+        res.status(500).send(err);
+    }
+}
+
+
+const addMainproduct=async(req,res)=>{
+
+    try {
+        const { image } = req.body;
+        const mainproduct= new Product({  image });
+        const mainproductsaved = await mainproduct.save();
+        res.status(201).send(mainproductsaved);
+    } catch (err) {
+        res.status(400).send(err);
+    }
+  };
+  
+      
 
 
 
@@ -185,5 +200,5 @@ const updateProduct = async (req, res) => {
   }
 };
 
-const productController={createProduct,getAllProducts,updateProduct,deleteProductById,getProductsByCategoryOrPrice}
+const productController={createProduct,addMainproduct,getProductById,getAllProducts,updateProduct,deleteProductById,getProductsByCategoryOrPrice}
 export default productController;

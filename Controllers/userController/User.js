@@ -66,13 +66,3 @@ export async function Signin(req, res) {
         res.status(500).json("Server error");
     }
 }
-
-
-
-
-
-export const Signout=(req, res)=> {
-    res.clearCookie(token)
-    res.status(200).json("signout  Scuccessfully...")
-   
-    }

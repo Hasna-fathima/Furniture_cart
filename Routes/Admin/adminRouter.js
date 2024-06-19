@@ -1,87 +1,119 @@
 import express from 'express';
-import { Signup, Signin,Signout} from '../../Controllers/admin/adminController.js';
+import adminController, { Signup, Signin,Signout} from '../../Controllers/admin/adminController.js';
 import productController from '../../Controllers/Productcontroller/product.js';
-import Offers from '../../Controllers/admin/offerController/offer.js';
+import categoryController from '../../Controllers/Categorycontroller/category.js';
+import usercontroll from '../../Controllers/admin/adminController.js';
+import AddressController from '../../Controllers/addressController/userAddress.js';
+import Offers from '../../Controllers/offerController/offer.js';
+import OrderController from '../../Controllers/orderController/order.js';
 import {upload} from '../../Middleware/upload.js';
-import { requireSignin,authenticateAdmin } from '../../Middleware/auth.js';
+import CartController from '../../Controllers/cartController/cart.js';
+import userRouter from '../user/userRouter.js';
 
 
 const adminRouter = express.Router();
 
 adminRouter.post('/signup', Signup);
 adminRouter.post('/signin', Signin);
-adminRouter.post('/signout',requireSignin,Signout);
-adminRouter.get('/getdashboard',getdashboard);
+adminRouter.post('/signout',Signout);
 
 
                      //-----------product Controll-----------//
 
 
-adminRouter.post('/create-product',upload.single('image'),authenticateAdmin, requireSignin,productController.createProduct); adminRouter.get('/product',requireSignin,productController.getProductsByCategoryOrPrice);
+adminRouter.post('/create-product',upload.single('image'),productController.createProduct);
+adminRouter.get('/product',productController.getProductsByCategoryOrPrice);
 adminRouter.get('/products',productController.getAllProducts);
-adminRouter.put('/product/:productId',upload.single('image'),requireSignin,authenticateAdmin,productController.updateProduct)
-adminRouter.delete('/productdelete/:productId',requireSignin,authenticateAdmin,productController.deleteProductById);
+adminRouter.put('/product/:productId',upload.single('image'),productController.updateProduct)
+adminRouter.delete('/productdelete/:productId',productController.deleteProductById);
+adminRouter.post('/mainproduct',productController.addMainproduct)
                 
 
 
                      //--------user manage----------------//
 
-adminRouter.get('/getalluser',getAllusers);
-adminRouter.get('/getuser',getuserbyId);
-adminRouter.get('/blockuser',blockedusers);
-adminRouter.get('/unblockusers',unblockedusers)
+adminRouter.get('/getalluser',usercontroll.getAllusers);
+adminRouter.get('/getuser/:id',usercontroll.getuserbyid);
+adminRouter.post('/blockuser/:id',usercontroll.blockedusers);
+adminRouter.post('/unblockusers/:id',usercontroll.unblockedusers)
 
 
 
                    // -------------Category Control----------//
 
 
- adminRouter.get('/category',requireSignin,authenticateAdmin,getCategory)
-adminRouter.post('/addCate',requireSignin,authenticateAdmin,AddCategory)
-adminRouter.get('/editCate/:id',requireSignin,authenticateAdmin,getEditCate)
-adminRouter.post('/editCate/:id',requireSignin,authenticateAdmin,EditCate)
-adminRouter.get('/deleteCate/:id',requireSignin,authenticateAdmin,deleteCategory)
-adminRouter.get('/unlistCategory/:id',requireSignin,authenticateAdmin,unlistCategory)
-adminRouter.get('/listCategory/:id',requireSignin,listCategory)
+adminRouter.get('/category',categoryController.getAllcategory)
+adminRouter.post('/addCate',categoryController.Createcategory)
+adminRouter.put('/editCate/:id',categoryController.updatecategory)
+adminRouter.get('/category/:slug',categoryController.getcategorysBySlug)
+adminRouter.delete('/deleteCate/:id',categoryController.deletecategoryById)
+
 
 
              //-----0rder COntrolling-------------//
 
 
              
-adminRouter.get('/order',authenticateAdmin,requireSignin,getOrders)
-adminRouter.get('/updateOrderStatus/:status/:id',authenticateAdmin,requireSignin,orderStatusUpdate)
-adminRouter.get('/returnView/:id',authenticateAdmin,requireSignin,order.orderReturnView)
-adminRouter.get('/returnRequestList',requireSignin,authenticateAdmin,returnRequests)
-adminRouter.get('/acceptReturn/:id/:odrId',authenticateAdmin,requireSignin,acceptOrderReturn)
-adminRouter.get('/rejectReturn/:id/:odrId',authenticateAdmin,requireSignin,rejectOrderReturn)
-adminRouter.get('/orderView/:id',requireSignin,authenticateAdmin,viewOrderDeatails)
+adminRouter.get('/order', OrderController.getOrders);
+adminRouter.get('/order', OrderController.getOrder)
+adminRouter.post('/order',OrderController.addOrder)
+adminRouter.put('/updateOrderStatus/:id',OrderController.updateOrderstatus)
+adminRouter.get('/returnView',OrderController.orderReturnView)
+adminRouter.get('/returnRequestList',OrderController.viewReturnRequest)
+adminRouter.get('/acceptReturn/:id/:odrId',OrderController.requestsResponse)
+
+
+
+              //------------UserAdrres------------//
+
+adminRouter.get('/address',AddressController.getAllUserAddresses)
+adminRouter.post('/address',AddressController.createUserAddress)
+adminRouter.get('/address/:userId',AddressController.getUserAddressById)
+adminRouter.put('/address',AddressController.updateUserAddressById)
+adminRouter.delete('/address/:id',AddressController.deleteUserAddressById)
 
 
 
                        //----Dashbord------//
 
 
-adminRouter.get('/count-orders-by-day',requireSignin,authenticateAdmin,dashboard.getCount)
-adminRouter.get('/count-orders-by-month',requireSignin,authenticateAdmin,dashboard.getCount)
-adminRouter.get('/count-orders-by-year',requireSignin,authenticateAdmin,dashboard.getCount)
-adminRouter.post('/salesreport',requireSignin,authenticateAdmin,dashboard.downloadSalesReport)
+
+
+adminRouter.get('/count-orders-by-day',adminController.getOrderCountsPerDay)
+adminRouter.get('/count-orders-by-month',adminController.getOrderCountsPerMonth)
+adminRouter.get('/count-orders-by-year',adminController.getOrderCountsPerYear)
+adminRouter.post('/salesreport',adminController.getTotalSalesReport)
 
 
 
-                        //----Banner-------//
 
- adminRouter.get('/banner',getBanner)
- adminRouter.get('/addbannerpage',getAddBanner)
- adminRouter.post('/addbanner',postAddBanner)
+
 
                        //------0ffer---------//
 
 adminRouter.get('/offers',Offers.getAlloffers);
 adminRouter.get('/offers/:Id',Offers.getOfferbyId)
-adminRouter.post('/offers',Offers.createoffers)
-adminRouter.put('/offers/:Id',Offers.editOfferbyId)
-adminRouter.delete('/offers/:Id',Offers.deleteOffer)
+adminRouter.post('/offers',upload.single('image'),Offers.createoffers)
+adminRouter.put('/offers/:id',upload.single('image'),Offers.editOfferbyId)
+adminRouter.delete('/offers/:id',Offers.deleteOffer)
+
+
+
+
+                       //-----------Cart---------//
+
+
+userRouter.post('/addcart/:userId',CartController.addCart);
+userRouter.patch('/cart/:cartId',CartController.editcart);
+userRouter.delete('/cart',CartController.deleteCartItem);
+userRouter.get('/cart/:userId',CartController.getCartByUser);
+userRouter.get('/cart',CartController.viewCart)
+
+
+
+
+
+
 
 
 

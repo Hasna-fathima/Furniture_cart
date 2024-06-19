@@ -1,4 +1,4 @@
-import  mongoose from  'mongoose';
+import  mongoose, { Mongoose } from  'mongoose';
 const categorySchema = new mongoose.Schema(
   {
     name: {
@@ -11,14 +11,10 @@ const categorySchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
-    categoryImage: { type: String },
-    parentId: {
-      type: String,
-    },
+    image: { type: String },
+  
     createdBy: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "admin",
-      required: true,
+      type:String,default:"admin"
     },
   },
   { timestamps: true }

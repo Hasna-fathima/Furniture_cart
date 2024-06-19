@@ -1,46 +1,20 @@
+import  Category from '../../Models/Category.js'
 
-import Category from "../../Models/Category"
 
 
-export const Createcategory=async(req,res)=>{
-    try{
-      if(!req.file){
-        return res.status(404).json("file is not visible")
-      }
-        cloudinaryInstance.uploader.upload(req.file.path,async(err,result)=>{
-            if(err){
-                console.log(err ,"error")
-                return res.status(500).json({
-                    success:false,
-                    message:"error"
-                })
-              }
-        const imgurl=result.url;
-        const{name,slug,parentId,createdBy}=req.body
-        
-        const Createcategory=new Category({
-          name,
-          slug,
-          image:imgurl,
-          parentId,
-          createdBy:req.admin._id,
+const Createcategory = async (req, res) => {
+  try {
+      const { name, slug, parentId, image, createdBy } = req.body;
+      const category = new Category({ name, slug, parentId, image, createdBy });
+      const savedCategory = await category.save();
+      res.status(201).send(savedCategory);
+  } catch (err) {
+      res.status(400).send(err);
+  }
+};
 
-        })
-       
-        if(!Createcategory){
-          return res.status(500).json("category is not created")
-        }
-        const newcategory= await Createcategory.save();
-        res.status(201).json(newcategory)
-      })
-
-    } catch (error) {
-        console.log(error);
-        return res.status(500).json({ error: 'Internal server error' });
-      }
-    }
     
-export const getAllcategory=async(req,res)=>{
+ const getAllcategory=async(req,res)=>{
   try {
       const categorys = await Category.find({});
       if (!categorys) {
@@ -54,92 +28,69 @@ export const getAllcategory=async(req,res)=>{
   };
 
 
-  export const updatecategory=async(req,res)=>{
-    const id=req.params.id;
-  
-    try {
-      const category = await Category.findoneAndUpdate({id:_id},{description,price,title,}, { new: true }
-      );
-      if (!category) {
-        return res.status(404).json({ error: 'category is not updated' });
-      }
-      res.status(200).json(category);
-    } catch (error) {
-      console.log(error);
-      return res.status(500).json({ error: 'Internal server error' });
+const updatecategory=async(req,res)=>{
+  const { id } = req.params;
+  const { name, slug } = req.body;
+
+  try {
+    const category = await Category.findByIdAndUpdate(
+      id,
+      { name, slug },
+      { new: true, runValidators: true }
+    );
+
+    if (!category) {
+      return res.status(404).send({ message: 'Category not found' });
     }
-  };
 
- 
-    exports.deletecategoryById = (req, res) => {
-      const { categoryId } = req.body.payload;
-      if (categoryId) {
-        category.deleteOne({ _id: categoryId }).exec((error, result) => {
-          if (error) return res.status(400).json({ error });
-          if (result) {
-            res.status(202).json({ result });
-          }
-        });
-      } else {
-        res.status(400).json({ error: "Params required" });
-      }
-    };
+    res.send(category);
+  } catch (error) {
+    res.status(500).send({ message: error.message });
+  }
+}
 
 
-    exports.getcategorysBySlug = (req, res) => {
-      const { slug } = req.params;
-      Category.findOne({ slug: slug })
-        .select("_id type")
-        .exec((error, category) => {
-          if (error) {
-            return res.status(400).json({ error });
-          }
-    
-          if (category) {
-            category.find({ category: category._id }).exec((error, categorys) => {
-              if (error) {
-                return res.status(400).json({ error });
-              }
-    
-              if (category.type) {
-                if (categorys.length > 0) {
-                  res.status(200).json({
-                    categorys,
-                    priceRange: {
-                      under5k: 5000,
-                      under10k: 10000,
-                      under15k: 15000,
-                      under20k: 20000,
-                      under30k: 30000,
-                    },
-                    categorysByPrice: {
-                      under5k: categorys.filter((category) => category.price <= 5000),
-                      under10k: categorys.filter(
-                        (category) => category.price > 5000 && category.price <= 10000
-                      ),
-                      under15k: categorys.filter(
-                        (category) => category.price > 10000 && category.price <= 15000
-                      ),
-                      under20k: categorys.filter(
-                        (category) => category.price > 15000 && category.price <= 20000
-                      ),
-                      under30k: categorys.filter(
-                        (category) => category.price > 20000 && category.price <= 30000
-                      ),
-                    },
-                  });
-                }
-              } else {
-                res.status(200).json({ categorys });
-              }
-            });
-          }
-        });
-    };
-            
+const deletecategoryById=async(req,res)=>{
+  const { id } = req.params;
+
+  try {
+    const category = await Category.findByIdAndDelete(id);
+
+    if (!category) {
+      return res.status(404).send({ message: 'Category not found' });
+    }
+
+    res.send({ message: 'Category deleted successfully' });
+  } catch (error) {
+    res.status(500).send({ message: error.message });
+  }
+
+}
+
+
+        
+
+  const getcategorysBySlug=async(req,res)=>{
+    const { slug } = req.params;
+
+    try {
+      const category = await Category.findOne({ slug });
   
+      if (!category) {
+        return res.status(404).send({ message: 'Category not found' });
+      }
+  
+      res.send(category);
+    } catch (error) {
+      res.status(500).send({ message: error.message });
+    }
+  }
+  
+  
+      
+  const categoryController={Createcategory,getAllcategory,getcategorysBySlug,updatecategory,deletecategoryById}
     
-
+export default categoryController
     
     
     

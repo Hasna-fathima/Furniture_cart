@@ -43,7 +43,9 @@ const productSchema = new mongoose.Schema({
     imagePublicId:{
         type:String,
         require:true
-    }
+    },
+    hasOffer:{type:Boolean},
+    discoundPercentage:{type:Number ,default:0}
    
 
 }, { timestamps: true });

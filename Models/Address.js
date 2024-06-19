@@ -1,74 +1,73 @@
-import mongoose from 'mongoose'
+import mongoose from 'mongoose';
+
 const addressSchema = new mongoose.Schema({
+  
   name: {
     type: String,
     required: true,
     trim: true,
     min: 3,
-    max: 50,
+    max: 50
   },
   mobileNumber: {
-    type: String,
+    type: Number,
     required: true,
-    trim: true,
+    trim: true
   },
   pinCode: {
     type: String,
-    required: true,
-    trim: true,
+    required: true
   },
   locality: {
     type: String,
     required: true,
     trim: true,
-    min: 10,
-    max: 100,
+    max: 100
   },
   address: {
     type: String,
-    required: true,
-    trim: true,
-    min: 10,
-    max: 100,
+    required: true
   },
   cityDistrictTown: {
     type: String,
     required: true,
-    trim: true,
+    trim: true
   },
   state: {
     type: String,
-    required: true,
-    required: true,
+    required: true
   },
   landmark: {
     type: String,
-    min: 10,
-    max: 100,
+    max: 100
   },
   alternatePhone: {
-    type: String,
+    type: Number
   },
   addressType: {
     type: String,
     required: true,
-    enum: ["home", "work"],
-    required: true,
-  },
+    enum: ["home", "work"]
+  }
 });
-
 
 const userAddressSchema = new mongoose.Schema(
   {
     user: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
-      ref: "User",
+      ref: "User"
     },
-    address: [addressSchema],
+    address: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Address"
+    }]
   },
   { timestamps: true }
 );
 
-mongoose.model("Address", addressSchema);
-module.exports = mongoose.model("UserAddress", userAddressSchema);
+const Address=mongoose.model("Address", addressSchema)
+
+const UserAddress= mongoose.model('UserAddress', userAddressSchema)
+
+export  {UserAddress,Address}

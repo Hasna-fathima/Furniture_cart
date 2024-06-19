@@ -39,7 +39,6 @@ const orderSchema = new mongoose.Schema(
     },
     paymentType: {
       type: String,
-      enum: ["cod", "card"],
       required: true,
     },
     offer: { type: Number },
@@ -50,7 +49,7 @@ const orderSchema = new mongoose.Schema(
       {
         type: {
           type: String,
-          enum: ["ordered", "packed", "shipped", "delivered"],
+          enum: ["ordered", "packed", "shipped", "delivered","returned",'returnRequested','requestAccepted','requesstRejected'],
           default: "ordered",
         },
         date: {
@@ -66,4 +65,6 @@ const orderSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-export default mongoose.model("Order", orderSchema);
+
+const Order= mongoose.model("Order", orderSchema);
+export default Order
