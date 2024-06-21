@@ -1,5 +1,5 @@
 import express from 'express'
-import {Signin,Signup} from '../../Controllers/userController/User.js';
+import {Signin,Signup,usermessage} from '../../Controllers/userController/User.js';
 import productController from '../../Controllers/Productcontroller/product.js';
 import categoryController from '../../Controllers/Categorycontroller/category.js';
 import Offers from '../../Controllers/offerController/offer.js';
@@ -10,10 +10,10 @@ import { authenticateUser, requireSignin } from '../../Middleware/auth.js';
 
 const userRouter=express.Router();
 
+
+
 userRouter.post('/signup',Signup);
 userRouter.post('/signin',Signin);
-
-
 
 
           //-------product------//
@@ -32,10 +32,8 @@ userRouter.get('/category/:slug',requireSignin,categoryController.getcategorysBy
 
 
 
-
-
-
-
+         //-----messagesend-----/
+userRouter.post('/message', usermessage)
 
          //------cart-------//
           

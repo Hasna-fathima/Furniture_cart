@@ -1,6 +1,7 @@
 import userModel from '../../Models/Usermodel.js'
 import bcryptjs from 'bcryptjs';
 import {generateToken} from '../../Utils/GenerateTokens.js'
+import Message from '../../Models/message.js'
 
 const saltRounds = 10;
 
@@ -41,6 +42,29 @@ export async function Signup(req, res) {
         res.status(500).json("Server error");
     }
 };
+
+
+export const usermessage=async(req,res)=>{
+     const { userId, name, email, phoneNumber, message } = req.body;
+ 
+     const newContact = new Message({
+         userId,
+         name,
+         email,
+         phoneNumber,
+         message,
+     });
+     try {
+         await newContact.save();
+         res.status(201).send('Contact information saved successfully');
+     } catch (error) {
+         console.error(error); 
+         res.status(400).send('Error saving contact information');
+     }
+ };
+
+
+
 
 
 

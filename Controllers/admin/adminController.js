@@ -6,6 +6,7 @@ import userModel from "../../Models/Usermodel.js";
 import {adminToken} from '../../Utils/GenerateTokens.js';
 import Order from "../../Models/ordermodel.js";
 import mongoose from "mongoose";
+import Message from '../../Models/message.js'
 
 dotenv.config();
 
@@ -124,6 +125,17 @@ const getAllusers = async (req, res) => {
         }
     }
 
+const viewmessage=async(req,res)=>{
+
+  try {
+    const message = await Message.find();
+    console.log('message',message)
+    res.status(200).json(message);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
 
 
 const unblockedusers=async(req,res)=>{
@@ -285,5 +297,5 @@ const unblockedusers=async(req,res)=>{
 
 
       
-const adminController={getAllusers,getuserbyid,blockedusers,unblockedusers,getOrderCountsPerYear,getOrderCountsPerDay,getOrderCountsPerMonth,getTotalSalesReport}
+const adminController={getAllusers,viewmessage,getuserbyid,blockedusers,unblockedusers,getOrderCountsPerYear,getOrderCountsPerDay,getOrderCountsPerMonth,getTotalSalesReport}
 export default adminController

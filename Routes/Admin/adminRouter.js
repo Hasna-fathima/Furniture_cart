@@ -36,6 +36,9 @@ adminRouter.get('/getalluser',usercontroll.getAllusers);
 adminRouter.get('/getuser/:id',usercontroll.getuserbyid);
 adminRouter.post('/blockuser/:id',usercontroll.blockedusers);
 adminRouter.post('/unblockusers/:id',usercontroll.unblockedusers)
+adminRouter.get('/messages',adminController.viewmessage)
+
+
 
 
 
@@ -64,6 +67,8 @@ adminRouter.get('/acceptReturn/:id/:odrId',OrderController.requestsResponse)
 
 
 
+
+
               //------------UserAdrres------------//
 
 adminRouter.get('/address',AddressController.getAllUserAddresses)
@@ -76,15 +81,10 @@ adminRouter.delete('/address/:id',AddressController.deleteUserAddressById)
 
                        //----Dashbord------//
 
-
-
-
 adminRouter.get('/count-orders-by-day',adminController.getOrderCountsPerDay)
 adminRouter.get('/count-orders-by-month',adminController.getOrderCountsPerMonth)
 adminRouter.get('/count-orders-by-year',adminController.getOrderCountsPerYear)
 adminRouter.post('/salesreport',adminController.getTotalSalesReport)
-
-
 
 
 
