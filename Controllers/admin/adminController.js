@@ -101,7 +101,7 @@ export const Signout=(req, res)=> {
 
 
 
-const getAllusers = async (req, res) => {
+ const getAllusers = async (req, res) => {
         try {
           const users = await userModel.find();
           console.log('users',users)
@@ -125,20 +125,10 @@ const getAllusers = async (req, res) => {
         }
     }
 
-const viewmessage=async(req,res)=>{
-
-  try {
-    const message = await Message.find();
-    console.log('message',message)
-    res.status(200).json(message);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-};
 
 
-const unblockedusers=async(req,res)=>{
+
+ const unblockedusers=async(req,res)=>{
     try {
         const { id } = req.params; // Extract id from req.params
     
@@ -161,7 +151,7 @@ const unblockedusers=async(req,res)=>{
       }
     };
 
-    const blockedusers = async (req, res) => {
+ const blockedusers = async (req, res) => {
         try {
           const { id } = req.params; // Extract id from req.params
       
@@ -187,7 +177,7 @@ const unblockedusers=async(req,res)=>{
 
 
 
-       const getOrderCountsPerDay = async (req, res) => {
+      const getOrderCountsPerDay = async (req, res) => {
         try {
           const result = await Order.aggregate([
             {
@@ -238,7 +228,7 @@ const unblockedusers=async(req,res)=>{
       };
 
 
-     const getOrderCountsPerYear = async (req, res) => {
+ const getOrderCountsPerYear = async (req, res) => {
         try {
           const result = await Order.aggregate([
             {
@@ -269,7 +259,7 @@ const unblockedusers=async(req,res)=>{
 
 
 
-      const getTotalSalesReport = async (req, res) => {
+     const getTotalSalesReport = async (req, res) => {
         try {
           const totalSales = await Order.aggregate([
             {
@@ -289,13 +279,24 @@ const unblockedusers=async(req,res)=>{
           res.status(500).send('Error generating total sales report');
         }
       };
+
+   const viewmessage=async(req,res)=>{
+
+        try {
+          const message = await Message.find();
+          console.log('message',message)
+          res.status(200).json(message);
+        } catch (error) {
+          console.error(error);
+          res.status(500).json({ error: 'Internal server error' });
+        }
+      };
+
+      const adminController={getAllusers,getOrderCountsPerDay,getOrderCountsPerMonth,getOrderCountsPerYear,blockedusers,unblockedusers,viewmessage,getTotalSalesReport,getuserbyid,}
       
-      
+      export default adminController
 
 
 
 
 
-      
-const adminController={getAllusers,viewmessage,getuserbyid,blockedusers,unblockedusers,getOrderCountsPerYear,getOrderCountsPerDay,getOrderCountsPerMonth,getTotalSalesReport}
-export default adminController

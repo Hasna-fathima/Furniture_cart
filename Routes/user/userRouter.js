@@ -18,10 +18,10 @@ userRouter.post('/signin',Signin);
 
           //-------product------//
           
- userRouter.get('/product',productController.getProductsByCategoryOrPrice);
+ userRouter.get('/products',productController.getProductsByCategoryOrPrice);
  userRouter.get('/products',productController.getAllProducts);
  userRouter.get('/product/:Id',productController.getProductById);
- userRouter.post('/mainproduct',productController.addMainproduct)
+ 
          
 
           //----category-----------//
@@ -35,9 +35,10 @@ userRouter.get('/category/:slug',requireSignin,categoryController.getcategorysBy
          //-----messagesend-----/
 userRouter.post('/message', usermessage)
 
+
          //------cart-------//
           
-userRouter.post('/addcart/:userId',requireSignin,authenticateUser,CartController.addCart);
+userRouter.post('/addcart/:userId',CartController.addCart);
 userRouter.patch('/cart/:cartId',requireSignin,authenticateUser,CartController.editcart);
 userRouter.get('/cart/:userId',requireSignin,authenticateUser,CartController.getCartByUser);
 userRouter.get('/cart',requireSignin,authenticateUser,CartController.viewCart)

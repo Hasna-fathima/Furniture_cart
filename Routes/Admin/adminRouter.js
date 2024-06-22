@@ -1,14 +1,13 @@
 import express from 'express';
-import adminController, { Signup, Signin,Signout} from '../../Controllers/admin/adminController.js';
+import {Signin,Signup,Signout} from '../../Controllers/admin/adminController.js';
 import productController from '../../Controllers/Productcontroller/product.js';
 import categoryController from '../../Controllers/Categorycontroller/category.js';
-import usercontroll from '../../Controllers/admin/adminController.js';
 import AddressController from '../../Controllers/addressController/userAddress.js';
 import Offers from '../../Controllers/offerController/offer.js';
 import OrderController from '../../Controllers/orderController/order.js';
 import {upload} from '../../Middleware/upload.js';
 import CartController from '../../Controllers/cartController/cart.js';
-import userRouter from '../user/userRouter.js';
+import adminController from '../../Controllers/admin/adminController.js';
 
 
 const adminRouter = express.Router();
@@ -26,20 +25,23 @@ adminRouter.get('/product',productController.getProductsByCategoryOrPrice);
 adminRouter.get('/products',productController.getAllProducts);
 adminRouter.put('/product/:productId',upload.single('image'),productController.updateProduct)
 adminRouter.delete('/productdelete/:productId',productController.deleteProductById);
-adminRouter.post('/mainproduct',productController.addMainproduct)
+
+
                 
 
 
                      //--------user manage----------------//
 
-adminRouter.get('/getalluser',usercontroll.getAllusers);
-adminRouter.get('/getuser/:id',usercontroll.getuserbyid);
-adminRouter.post('/blockuser/:id',usercontroll.blockedusers);
-adminRouter.post('/unblockusers/:id',usercontroll.unblockedusers)
+adminRouter.get('/getalluser',adminController.getAllusers);
+adminRouter.get('/getuser/:id',adminController.getuserbyid);
+adminRouter.post('/blockuser/:id',adminController.blockedusers);
+adminRouter.post('/unblockusers/:id',adminController.unblockedusers)
+
+
+
+                //---------message----//
+
 adminRouter.get('/messages',adminController.viewmessage)
-
-
-
 
 
                    // -------------Category Control----------//
@@ -58,7 +60,6 @@ adminRouter.delete('/deleteCate/:id',categoryController.deletecategoryById)
 
              
 adminRouter.get('/order', OrderController.getOrders);
-adminRouter.get('/order', OrderController.getOrder)
 adminRouter.post('/order',OrderController.addOrder)
 adminRouter.put('/updateOrderStatus/:id',OrderController.updateOrderstatus)
 adminRouter.get('/returnView',OrderController.orderReturnView)
@@ -88,7 +89,6 @@ adminRouter.post('/salesreport',adminController.getTotalSalesReport)
 
 
 
-
                        //------0ffer---------//
 
 adminRouter.get('/offers',Offers.getAlloffers);
@@ -102,18 +102,11 @@ adminRouter.delete('/offers/:id',Offers.deleteOffer)
 
                        //-----------Cart---------//
 
-
-userRouter.post('/addcart/:userId',CartController.addCart);
-userRouter.patch('/cart/:cartId',CartController.editcart);
-userRouter.delete('/cart',CartController.deleteCartItem);
-userRouter.get('/cart/:userId',CartController.getCartByUser);
-userRouter.get('/cart',CartController.viewCart)
-
-
-
-
-
-
+adminRouter.post('/addcart/:userId',CartController.addCart);
+adminRouter.patch('/cart/:cartId',CartController.editcart);
+adminRouter.delete('/cart',CartController.deleteCartItem);
+adminRouter.get('/cart/:userId',CartController.getCartByUser);
+adminRouter.get('/cart',CartController.viewCart)
 
 
 

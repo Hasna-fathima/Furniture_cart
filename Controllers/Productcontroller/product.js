@@ -156,21 +156,8 @@ const getProductById=async(req,res)=>{
 }
 
 
-const addMainproduct=async(req,res)=>{
-
-    try {
-        const { image } = req.body;
-        const mainproduct= new Product({  image });
-        const mainproductsaved = await mainproduct.save();
-        res.status(201).send(mainproductsaved);
-    } catch (err) {
-        res.status(400).send(err);
-    }
-  };
   
       
-
-
 
  const getProductsByCategoryOrPrice = async (req, res) => {
   try {
@@ -200,5 +187,5 @@ const addMainproduct=async(req,res)=>{
   }
 };
 
-const productController={createProduct,addMainproduct,getProductById,getAllProducts,updateProduct,deleteProductById,getProductsByCategoryOrPrice}
+const productController={createProduct,getProductById,getAllProducts,updateProduct,deleteProductById,getProductsByCategoryOrPrice}
 export default productController;
