@@ -1,14 +1,16 @@
-import Order from '../../Models/ordermodel.js'
-import Cart from "../../Models/Cartmodel.js";
-import {Address} from "../../Models/Address.js";
-import Product from '../../Models/prodectmodel.js';
-import mongoose from "mongoose";
-import Offer from '../../Models/offer.js'
-import items from "../../Models/ordermodel.js";
+import crypto from 'crypto';
 import Razorpay from 'razorpay';
 import dotenv from 'dotenv';
-import crypto from 'crypto';
-import  Twilio  from "twilio";
+import Twilio from 'twilio';
+import userModel from '../../Models/Usermodel.js';
+import Order from '../../Models/ordermodel.js';
+import Product from '../../Models/prodectmodel.js';
+import {Address} from '../../Models/Address.js'
+import Paymentmodel from '../../Models/Paymentmodel.js';
+dotenv.config();
+
+const client = Twilio(process.env.ACCOUNT_SID, process.env.AUTH_TOKEN);
+
 
 
 const razorpay = new Razorpay({
@@ -17,16 +19,12 @@ const razorpay = new Razorpay({
 });
 
 
-
-dotenv.config()
-  const client=Twilio(process.env.ACCOUNT_SID,process.env.AUTH_TOKEN)
-
-const addOrder = async (req, res) => {
+export const addOrder = async (req, res) => {
   const { userId, addressId, products } = req.body;
 
   try {
     // Fetch user and address details
-    const user = await User.findById(userId);
+    const user = await userModel.findById(userId);
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
@@ -38,6 +36,8 @@ const addOrder = async (req, res) => {
 
     // Calculate total amount for the order
     let totalAmount = 0;
+    const items = []; // Array to store order items
+
     for (let product of products) {
       const productDoc = await Product.findById(product.productId);
       if (!productDoc) {
@@ -46,39 +46,54 @@ const addOrder = async (req, res) => {
       const productPrice = productDoc.price;
       const offerPercentage = productDoc.offerPercentage || 0;
       const discountedPrice = productPrice - (productPrice * offerPercentage) / 100;
+
+      // Push item details to items array
+      items.push({
+        productId: product.productId,
+        payablePrice: discountedPrice,
+        purchasedQty: product.quantity,
+      });
+
+      // Calculate total amount for the order
       totalAmount += discountedPrice * product.quantity;
     }
 
     // Create a new order
-    const newOrder = await Order.create({
-      userId,
-      addressId,
-      products,
-      totalAmount
+    const newOrder = new Order({
+      user: userId,
+      addressId: addressId,
+      totalAmount: totalAmount,
+      items: items,
+      paymentStatus: 'pending', 
+      paymentType: 'Razorpay', 
     });
 
-    // Initiate payment with Razorpay
+    const savedOrder = await newOrder.save();
+
+    
     const razorpayOptions = {
-      amount: totalAmount * 100, // amount in paise
+      amount: totalAmount * 100, 
       currency: 'INR',
-      receipt: `order_${newOrder._id}`
+      receipt: crypto.randomBytes(10).toString('hex'),
     };
 
     const razorpayOrder = await razorpay.orders.create(razorpayOptions);
 
-    // Update order with payment details
-    newOrder.paymentDetails = {
-      razorpayOrderID: razorpayOrder.id,
-      amount: razorpayOrder.amount / 100, // amount in rupees
-      currency: razorpayOrder.currency
-    };
-    await newOrder.save();
-
-    res.status(201).json({
-      orderId: newOrder._id,
+    
+    savedOrder.paymentDetails = {
       razorpayOrderID: razorpayOrder.id,
       amount: razorpayOrder.amount / 100,
-      currency: razorpayOrder.currency
+      currency: razorpayOrder.currency,
+    };
+
+    
+    await savedOrder.save();
+
+    res.status(201).json({
+      orderId: savedOrder._id,
+      razorpayOrderID: razorpayOrder.id,
+      amount: razorpayOrder.amount / 100,
+      currency: razorpayOrder.currency,
     });
   } catch (error) {
     console.error(error);
@@ -88,53 +103,26 @@ const addOrder = async (req, res) => {
 
 
 
+const verify=async(req,res)=>{
+  try {
+		const {razorpay_order_id, razorpay_payment_id, razorpay_signature } =
+			req.body;
+		const sign = razorpay_order_id + "|" + razorpay_payment_id;
+		const expectedSign = crypto
+			.createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
+			.update(sign.toString())
+			.digest("hex");
 
-
-// Middleware
-
-
-// POST route for Razorpay webhook
-const webHook= (req, res) => {
-  const { body } = req;
-  const { order_id, payment_id, status } = body.payload.payment.entity;
-
-  // Verify the signature to ensure the request came from Razorpay
-  const hmac = crypto.createHmac('sha256', process.env.RAZORPAY_WEBHOOK_SECRET);
-  hmac.update(JSON.stringify(body));
-  const generatedSignature = hmac.digest('hex');
-
-  if (generatedSignature === req.headers['x-razorpay-signature']) {
-    // Signature is valid, process payment status
-    if (status === 'captured') {
-      // Update order payment status as successful
-      Order.findOneAndUpdate(
-        { 'paymentDetails.razorpayOrderID': order_id },
-        { $set: { paymentStatus: 'Success', 'paymentDetails.payment_id': payment_id } },
-        { new: true }
-      )
-        .then(order => {
-          if (!order) {
-            return res.status(404).json({ error: 'Order not found' });
-          }
-          // Handle further actions (e.g., send confirmation email, update inventory)
-          res.status(200).send('Payment success');
-        })
-        .catch(err => {
-          console.error(err);
-          res.status(500).json({ error: err.message });
-        });
-    } else {
-      res.status(400).send('Payment failed');
-    }
-  } else {
-    res.status(403).send('Invalid signature');
-  }
+		if (razorpay_signature === expectedSign) {
+			return res.status(200).json({ message: "Payment verified successfully" });
+		} else {
+			return res.status(400).json({ message: "Invalid signature sent!" });
+		}
+	} catch (error) {
+		res.status(500).json({ message: "Internal Server Error!" });
+		console.log(error);
+	}
 }
-
-
-
-
-
 
 const getOrders = async (req, res) => {
   try {
@@ -296,6 +284,8 @@ const viewReturnRequest=async(req,res)=>{
 
 
 
+
+
  const requestsResponse=async(req,res)=>{
   try{
     const orderId=req.params.orderId
@@ -324,5 +314,8 @@ const viewReturnRequest=async(req,res)=>{
   
     }
   };
-const OrderController={addOrder,getOrder,getOrders,webHook,updateOrderstatus,orderReturnView,viewReturnRequest,requestsResponse}
+
+
+
+const OrderController={addOrder,verify,getOrder,getOrders,updateOrderstatus,orderReturnView,viewReturnRequest,requestsResponse}
 export default OrderController

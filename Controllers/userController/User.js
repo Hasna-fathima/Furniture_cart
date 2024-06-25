@@ -3,16 +3,20 @@ import bcryptjs from 'bcryptjs';
 import {generateToken} from '../../Utils/GenerateTokens.js'
 import Message from '../../Models/message.js'
 
-const saltRounds = 10;
 
 
+
+const saltRounds=10
 const hashPassword = async (password) => {
     try {
-        return await bcryptjs.hash(password, saltRounds);
+        const hashedPassword= await bcryptjs.hash(password, saltRounds);
+        return hashedPassword
     } catch (error) {
+        console.log('error hashing paasword', error)
         throw new Error("Error hashing password");
     }
 };
+
 
 export async function Signup(req, res) {
     try {
@@ -42,6 +46,9 @@ export async function Signup(req, res) {
         res.status(500).json("Server error");
     }
 };
+
+
+
 
 
 export const usermessage=async(req,res)=>{
@@ -79,8 +86,10 @@ export async function Signin(req, res) {
         }
 
         var token = generateToken(email);
+        const userId=userExist._id;
         res.cookie("token",token);
-        res.json("login sucessfull");
+        res.status(200).json({userId,message:"login successfull"});
+        
         return token
     } catch (error) {
         console.log(error);

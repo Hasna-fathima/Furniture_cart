@@ -24,4 +24,5 @@ import mongoose from 'mongoose';
     }
  )
 
- module.exports=mongoose.model('return',returnSchema)
+ const Return = mongoose.model('Return',returnSchema)
+  export default Return;

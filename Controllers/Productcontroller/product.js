@@ -156,8 +156,7 @@ const getProductById=async(req,res)=>{
 }
 
 
-  
-      
+
 
  const getProductsByCategoryOrPrice = async (req, res) => {
   try {

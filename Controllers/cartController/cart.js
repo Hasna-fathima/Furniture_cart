@@ -189,3 +189,4 @@ const deleteCartItem = async (req, res) => {
 
 const CartController={ addCart,viewCart,editcart,deleteCartItem,getCartByUser}
 export default CartController
+

@@ -7,8 +7,11 @@ import AddressController from '../../Controllers/addressController/userAddress.j
 import CartController from '../../Controllers/cartController/cart.js';
 import OrderController from '../../Controllers/orderController/order.js'
 import { authenticateUser, requireSignin } from '../../Middleware/auth.js';
+import returncontroller from '../../Controllers/return/return.js';
+
 
 const userRouter=express.Router();
+
 
 
 
@@ -32,6 +35,7 @@ userRouter.get('/category/:slug',requireSignin,categoryController.getcategorysBy
 
 
 
+
          //-----messagesend-----/
 userRouter.post('/message', usermessage)
 
@@ -39,19 +43,23 @@ userRouter.post('/message', usermessage)
          //------cart-------//
           
 userRouter.post('/addcart/:userId',CartController.addCart);
-userRouter.patch('/cart/:cartId',requireSignin,authenticateUser,CartController.editcart);
-userRouter.get('/cart/:userId',requireSignin,authenticateUser,CartController.getCartByUser);
-userRouter.get('/cart',requireSignin,authenticateUser,CartController.viewCart)
+userRouter.patch('/cart/:cartId',CartController.editcart);
+userRouter.get('/cart/:userId',CartController.getCartByUser);
+userRouter.get('/cart',CartController.viewCart)
+userRouter.delete('/cart',CartController.deleteCartItem);
 
 
 
             //--------Address--------//
 
 
-userRouter.post('/address',authenticateUser,requireSignin,AddressController.createUserAddress)
+userRouter.post('/address',AddressController.createUserAddress)
 userRouter.get('/address/:userId',requireSignin,authenticateUser,AddressController.getUserAddressById)
 userRouter.put('/address',AddressController.updateUserAddressById)
 
+
+           //------return------//
+userRouter.post('/return',returncontroller.Returnorder)
 
          //-----Offers-----------//
 
@@ -69,6 +77,7 @@ userRouter.get('/order', OrderController.getOrders);
 userRouter.get('/order', OrderController.getOrder)
 userRouter.post('/order',OrderController.addOrder)
 userRouter.get('/acceptReturn/:id/:odrId',OrderController.requestsResponse)
+userRouter.post('/razorpay/verify',OrderController.verify)
 
 
 

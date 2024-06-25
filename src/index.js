@@ -11,17 +11,17 @@ dotenv.config()
 const app = express();
 
 
-const corsOptions={
-  origin:[`https://furniturecartfrondend.netlify.app`],
-  Credentials:true,
-  optionsSuccessStatus:200
-}
+//const corsOptions={
+//  origin:[`https://furniturecartfrondend.netlify.app`],
+ // Credentials:true,
+//  optionsSuccessStatus:200
+//}
 
 
 
 const port = process.env.PORT
 app.use(express.json());
-app.use(cors(corsOptions));
+app.use(cors());
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/api/user',userRouter)
