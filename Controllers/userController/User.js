@@ -3,9 +3,6 @@ import bcryptjs from 'bcryptjs';
 import {generateToken} from '../../Utils/GenerateTokens.js'
 import Message from '../../Models/message.js'
 
-
-
-
 const saltRounds=10
 const hashPassword = async (password) => {
     try {
@@ -49,8 +46,6 @@ export async function Signup(req, res) {
 
 
 
-
-
 export const usermessage=async(req,res)=>{
      const { userId, name, email, phoneNumber, message } = req.body;
  
@@ -70,29 +65,40 @@ export const usermessage=async(req,res)=>{
      }
  };
 
-
-
 export async function Signin(req, res) {
     try {
         const { email, password } = req.body;
+        console.log("Received Email:", email);
+
         const userExist = await userModel.findOne({ email });
         if (!userExist) {
-            return res.json("User does not exist");
+            console.log("User does not exist");
+            return res.status(404).json({ message: "User does not exist" });
         }
 
         const matchPassword = await bcryptjs.compare(password, userExist.password);
         if (!matchPassword) {
-            return res.json("Password is not correct");
+            console.log("Password is not correct");
+            return res.status(401).json({ message: "Password is not correct" });
         }
 
-        var token = generateToken(email);
-        const userId=userExist._id;
-        res.cookie("token",token);
-        res.status(200).json({userId,message:"login successfull"});
+        const token = generateToken(email);
+        console.log("Generated Token:", token);
         
-        return token
+
+        const userId = userExist._id;
+        console.log("User ID:", userId);
+        res.cookie("token", token, { httpOnly: true });
+
+        
+        const responseBody = { test: "This is a test response", token };
+        console.log("Response Body:", responseBody);
+
+    
+        res.status(200).json(responseBody);
+
     } catch (error) {
-        console.log(error);
-        res.status(500).json("Server error");
+        console.error("Server error:", error);
+        res.status(500).json({ message: "Server error" });
     }
 }

@@ -1,4 +1,8 @@
-import mongoose from 'mongoose';
+import  mongoose from  'mongoose';
+import Product from '../Models/prodectmodel.js';
+import { Address } from '../Models/Address.js';
+import userModel from '../Models/Usermodel.js';
+
 
 const orderSchema = new mongoose.Schema(
   {
@@ -9,7 +13,7 @@ const orderSchema = new mongoose.Schema(
     },
     addressId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "UserAddress.address",
+      ref: "Address",
       required: true,
     },
     totalAmount: {
@@ -49,7 +53,7 @@ const orderSchema = new mongoose.Schema(
       {
         type: {
           type: String,
-          enum: ["ordered", "packed", "shipped", "delivered","returned",'returnRequested','requestAccepted','requesstRejected'],
+          enum: ["ordered", "packed", "shipped", "delivered","returned",'returnRequested','requestAccepted','requestRejected'],
           default: "ordered",
         },
         date: {

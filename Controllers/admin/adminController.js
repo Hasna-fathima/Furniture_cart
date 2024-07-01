@@ -71,13 +71,17 @@ export const Signin = async (req, res) => {
             return res.status(400).json({ message: "Invalid password" });
         }
 
-        // Pass the entire admin object to adminToken function
+      
         const token = adminToken(admin);
+          
+        
+      
        
         res.cookie("token" , token, { httpOnly: true, maxAge: 86400000 });
 
-        const { _id, username, email: adminEmail, role } = admin;
+        const { userId, username, email: adminEmail, role } = admin;
         return res.status(200).json({
+            
             token,
             user: { _id, username, email: adminEmail, role },
         });
@@ -130,7 +134,7 @@ export const Signout=(req, res)=> {
 
  const unblockedusers=async(req,res)=>{
     try {
-        const { id } = req.params; // Extract id from req.params
+        const { id } = req.params; 
     
         if (!mongoose.Types.ObjectId.isValid(id)) {
           return res.status(400).json({ message: 'Invalid user ID format' });
@@ -153,7 +157,7 @@ export const Signout=(req, res)=> {
 
  const blockedusers = async (req, res) => {
         try {
-          const { id } = req.params; // Extract id from req.params
+          const { id } = req.params; 
       
           if (!mongoose.Types.ObjectId.isValid(id)) {
             return res.status(400).json({ message: 'Invalid user ID format' });
@@ -186,7 +190,7 @@ export const Signout=(req, res)=> {
                 totalOrders: { $sum: 1 }
               }
             },
-            { $sort: { _id: 1 } } // Sort by date
+            { $sort: { _id: 1 } } 
           ]);
       
           res.json(result);
@@ -211,10 +215,10 @@ export const Signout=(req, res)=> {
                 totalOrders: { $sum: 1 }
               }
             },
-            { $sort: { "_id.year": 1, "_id.month": 1 } } // Sort by year and month
+            { $sort: { "_id.year": 1, "_id.month": 1 } }
           ]);
       
-          // Format the result to a more readable format
+      
           const formattedResult = result.map(item => ({
             month: `${item._id.year}-${String(item._id.month).padStart(2, '0')}`,
             totalOrders: item.totalOrders
@@ -240,7 +244,7 @@ export const Signout=(req, res)=> {
             { $sort: { "_id.year": 1 } } // Sort by year
           ]);
       
-          // Format the result to a more readable format
+        
           const formattedResult = result.map(item => ({
             year: item._id.year,
             totalOrders: item.totalOrders

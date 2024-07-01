@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose from 'mongoose'
 
 const addressSchema = new mongoose.Schema({
   
@@ -56,7 +56,7 @@ const userAddressSchema = new mongoose.Schema(
     user: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
-      ref: "User"
+      ref: "usermodel"
     },
     address: [{
       type: mongoose.Schema.Types.ObjectId,

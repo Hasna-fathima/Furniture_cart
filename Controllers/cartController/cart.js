@@ -5,6 +5,8 @@ import userModel from '../../Models/Usermodel.js';
 
 
 
+
+
 const addCart = async (req, res) => {
     try {
         let cart = await Cart.findOne({ user: req.params.userId });
@@ -27,7 +29,7 @@ const addCart = async (req, res) => {
             cart.cartItems.push({ 
                 product: productId, 
                 quantity,
-                image: product.image,
+                image: product.imagePublicId,
                 name: product.name,
                 price: product.price
             });
@@ -41,7 +43,58 @@ const addCart = async (req, res) => {
 };
         
 
-const viewCart=async(req,res)=>{
+
+
+
+
+
+
+
+    const getCartByUser= async (req, res) => {
+      try {
+        const { userId } = req.params;
+    
+        if (!userId) {
+          return res.status(400).json({ error: 'Missing user ID' });
+        }
+    
+        if (!mongoose.Types.ObjectId.isValid(userId)) {
+          return res.status(400).json({ error: 'Invalid user ID format' });
+        }
+    
+        const cart = await Cart.findOne({ user: userId }).populate({
+          path: 'cartItems.product',
+          select: 'name price imagePublicId',
+        });
+    
+        if (!cart) {
+          return res.status(404).json({ error: 'Cart not found' });
+        }
+    
+        const populatedCartItems = cart.cartItems.map(item => {
+          console.log('Product:', item.product); // Log to check the populated product
+          return {
+            product: item.product._id,
+            quantity: item.quantity,
+            name: item.product.name,
+            imagePublicId: item.product.imagePublicId, // Ensure this field exists
+            price: item.product.price,
+          };
+        });
+    
+        console.log('Populated Cart Items:', populatedCartItems); // Log to verify populated items
+    
+        res.json({ cartItems: populatedCartItems, cartId: cart._id });
+      } catch (error) {
+        console.error('Error fetching cart:', error);
+        res.status(500).json({ error: 'Failed to fetch cart' });
+      }
+    };
+    
+
+
+
+    const viewCart=async(req,res)=>{
       try{
         const cart = await Cart.find({});
         if (!cart) {
@@ -53,46 +106,6 @@ const viewCart=async(req,res)=>{
         return res.status(500).json({ error: 'Internal server error' });
       }
     };
-
-
-
-
-
-
-    const getCartByUser= async (req, res) => {
-      try {
-        const { userId } = req.params;
-    
-        // Log received user ID
-        console.log(`Received userId: ${userId}`);
-    
-        // Validate input
-        if (!userId) {
-          return res.status(400).json({ error: 'Missing user ID' });
-        }
-    
-        // Ensure the userId is in the correct format (for example, a MongoDB ObjectId)
-        if (!mongoose.Types.ObjectId.isValid(userId)) {
-          return res.status(400).json({ error: 'Invalid user ID format' });
-        }
-    
-        // Find the cart by user ID
-        const cart = await Cart.findOne({ user: userId });
-    
-        if (!cart) {
-          console.log(`Cart not found for userId: ${userId}`);
-          return res.status(404).json({ error: 'Cart not found' });
-        }
-    
-        // Return the cart
-        res.json(cart);
-      } catch (error) {
-        console.error('Error fetching cart:', error);
-        res.status(500).json({ error: 'Failed to fetch cart' });
-      }
-    };
-
-
       
 
     const editcart = async (req, res) => {
@@ -100,10 +113,9 @@ const viewCart=async(req,res)=>{
         const { cartId } = req.params;
         const { productId, quantity } = req.body;
     
-        // Log received parameters
+
         console.log(`Received cartId: ${cartId}, productId: ${productId}, quantity: ${quantity}`);
-    
-        // Validate inputs
+
         if (!cartId || !productId || quantity == null) {
           return res.status(400).json({ error: 'Missing required fields' });
         }
@@ -160,25 +172,25 @@ const deleteCartItem = async (req, res) => {
   }
 
   Cart.findOneAndUpdate(
-      // Filter: find the cart belonging to the user
+ 
       { user: userId },
-      // Update: remove the item from the cartItems array
+      
       { $pull: { cartItems: { product: productId } } },
-      // Options: return the updated document
+      
       { new: true }
   )
       .then(updatedCart => {
-          // Check if the cart exists and handle accordingly
+        
           if (updatedCart) {
-              // Cart item successfully removed
+        
               res.json({ message: 'Cart item removed', cart: updatedCart });
           } else {
-              // Cart not found or item not removed
+        
               res.status(404).json({ message: 'Cart item not removed' });
           }
       })
       .catch(error => {
-          // Handle any errors
+
           console.error('Error removing cart item:', error);
           res.status(500).json({ message: 'Internal server error' });
       });

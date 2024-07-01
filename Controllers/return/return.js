@@ -8,13 +8,12 @@ const Returnorder =async(req,res)=>{
     const { userid, orderid, productid, description } = req.body;
 
   try {
-    // Check if the product exists
+  
     const product = await Product.findById(productid);
     if (!product) {
       return res.status(404).json({ message: 'Product not found' });
     }
 
-    // Create a new return request
     const newReturn = new Return({
       userid,
       orderid,
@@ -36,5 +35,3 @@ const Returnorder =async(req,res)=>{
   const returncontroller={Returnorder}
   export default returncontroller
   
-
-

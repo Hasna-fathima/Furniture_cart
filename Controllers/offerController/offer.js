@@ -16,9 +16,9 @@ const createoffers = async (req, res) => {
         const endDateNormalized = new Date(endDate);
         endDateNormalized.setHours(23, 59, 59, 999);
     
-        // Assuming you have already configured multer for file uploads
+    
         if (!req.file) {
-          return res.status(400).json({ message: 'Image file is required' });
+          return res.status(400).json({ message: 'Image file is required' });//multer
         }
     
         const offer = new Offer({
@@ -27,7 +27,7 @@ const createoffers = async (req, res) => {
           discountPercentage,
           startDate: startDateNormalized,
           endDate: endDateNormalized,
-          image: req.file.path // Assuming multer has saved the file and added its path to req.file
+          image: req.file.path 
         });
     
         await offer.save();
@@ -36,7 +36,7 @@ const createoffers = async (req, res) => {
         if (product) {
           product.hasOffer = true;
           product.discountPercentage = discountPercentage;
-          product.image = req.file.path; // Update product image with offer image
+          product.image = req.file.path; 
           await product.save();
         }
     
@@ -81,7 +81,7 @@ const editOfferbyId=async (req,res)=>{
     try {
         const { title, productId, discountPercentage, startDate, endDate } = req.body;
     
-        // Construct updated fields object
+      
         const updatedFields = {
           title,
           productId,
@@ -91,7 +91,7 @@ const editOfferbyId=async (req,res)=>{
           image: req.file ? req.file.path : null // Update image only if a new file is uploaded
         };
     
-        // Find the offer by ID and update its details
+    
         const updatedOffer = await Offer.findByIdAndUpdate(req.params.id, updatedFields, { new: true });
     
         if (!updatedOffer) {

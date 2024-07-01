@@ -4,7 +4,7 @@ import productController from '../../Controllers/Productcontroller/product.js';
 import categoryController from '../../Controllers/Categorycontroller/category.js';
 import AddressController from '../../Controllers/addressController/userAddress.js';
 import Offers from '../../Controllers/offerController/offer.js';
-import OrderController from '../../Controllers/orderController/order.js';
+import OrderController from '../../Controllers/orderController/order.js'
 import {upload} from '../../Middleware/upload.js';
 import CartController from '../../Controllers/cartController/cart.js';
 import adminController from '../../Controllers/admin/adminController.js';
@@ -22,10 +22,12 @@ adminRouter.post('/signout',Signout);
 
 
 adminRouter.post('/create-product',upload.single('image'),productController.createProduct);
+adminRouter.get('/product/:Id',productController.getProductById);
 adminRouter.get('/product',productController.getProductsByCategoryOrPrice);
 adminRouter.get('/products',productController.getAllProducts);
 adminRouter.put('/product/:productId',upload.single('image'),productController.updateProduct)
 adminRouter.delete('/productdelete/:productId',productController.deleteProductById);
+
 
 
                 
@@ -57,16 +59,12 @@ adminRouter.delete('/deleteCate/:id',categoryController.deletecategoryById)
 
 
              //-----0rder COntrolling-------------//
-
-
              
-adminRouter.get('/order', OrderController.getOrders);
+adminRouter.get('/Orders',OrderController.getOrders)
 adminRouter.post('/order',OrderController.addOrder)
-adminRouter.put('/updateOrderStatus/:id',OrderController.updateOrderstatus)
+adminRouter.put('/updateOrderStatus/:orderId',OrderController.updateOrderstatus)
 adminRouter.get('/returnView',OrderController.orderReturnView)
-adminRouter.get('/returnRequestList',OrderController.viewReturnRequest)
 adminRouter.get('/acceptReturn/:id/:odrId',OrderController.requestsResponse)
-
 
 
 

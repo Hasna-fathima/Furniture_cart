@@ -3,15 +3,15 @@ import mongoose from 'mongoose';
     {
         userid:{
             type:mongoose.Schema.Types.ObjectId,
-            ref:'user'
+            ref:'User'
         },
         orderid:{
             type:mongoose.Schema.Types.ObjectId,
-            ref:"order"
+            ref:"Order"
         },
         productid:{
             type:mongoose.Schema.Types.ObjectId,
-            ref:"product"
+            ref:"Product"
         },
         description:{
             type:String

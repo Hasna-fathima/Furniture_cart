@@ -46,18 +46,16 @@ const updateUserAddressById = async (req, res) => {
   try {
     const { userId, addressId, updates } = req.body;
 
-    // Validate user ID and address ID
+   
     if (!mongoose.Types.ObjectId.isValid(userId) || !mongoose.Types.ObjectId.isValid(addressId)) {
       return res.status(400).json({ error: 'Invalid user ID or address ID' });
     }
 
-    // Find the UserAddress document
     const userAddress = await UserAddress.findOne({ user: userId });
     if (!userAddress) {
       return res.status(404).json({ error: 'User address not found' });
     }
 
-    // Fetch the address document from the Address collection
     const addressToUpdate = await Address.findById(addressId);
     if (!addressToUpdate) {
       return res.status(404).json({ error: 'Address not found' });
@@ -68,7 +66,6 @@ const updateUserAddressById = async (req, res) => {
       addressToUpdate[key] = updates[key];
     }
 
-    // Save changes to the address document
     await addressToUpdate.save();
 
     res.status(200).json(addressToUpdate);
@@ -81,7 +78,6 @@ const updateUserAddressById = async (req, res) => {
 
 
 
-// Get all user addresses
  const getAllUserAddresses = async (req, res) => {
   try {
     const userAddresses = await Address.find();
@@ -94,31 +90,24 @@ const updateUserAddressById = async (req, res) => {
 
 
 
-
-// Get user address by ID
  const getUserAddressById = async (req, res) => {
   try {
-    // Extract userId from request parameters
+
     const { userId } = req.params;
 
-    // Check if the userId is a valid ObjectId
+
     if (!mongoose.Types.ObjectId.isValid(userId)) {
       return res.status(400).json({ error: 'Invalid user ID' });
     }
-
-    // Find the user by userId
     const user = await userModel.findById(userId);
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
-
-    // Find addresses associated with the user ID
     const addresses = await UserAddress.find({ user: userId });
 
-    // Send the addresses in the response
     res.status(200).json(addresses);
   } catch (error) {
-    // Handle any errors and send an error response
+
     console.error('Error fetching user addresses:', error);
     res.status(500).json({ error: 'Error fetching user addresses' });
   }
@@ -128,7 +117,6 @@ const updateUserAddressById = async (req, res) => {
 
 
 
-// Delete user address by ID
  const deleteUserAddressById = async (req, res) => {
   try {
     const { id } = req.params;
