@@ -73,14 +73,14 @@ export const Signin = async (req, res) => {
     res.cookie("token", token, { httpOnly: true, maxAge: 86400000 }); // 1 day
 
     // Extract admin details
-    const userId = admin._id;
+    const _id = admin._id;
     const { username, email: adminEmail, role } = admin;
 
     // Send response
     return res.status(200).json({
         message: "Login successful",
         token,
-        user: { userId, username, email: adminEmail, role },
+        user: { _id, username, email: adminEmail, role },
     });
 
 } catch (error) {
