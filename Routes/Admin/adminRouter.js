@@ -65,6 +65,7 @@ adminRouter.post('/order',OrderController.addOrder)
 adminRouter.put('/updateOrderStatus/:orderId',OrderController.updateOrderstatus)
 adminRouter.get('/returnView',OrderController.orderReturnView)
 adminRouter.get('/acceptReturn/:id/:odrId',OrderController.requestsResponse)
+adminRouter.get('/order/:userId',OrderController.orderview)
 
 
 

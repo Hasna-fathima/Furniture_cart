@@ -47,49 +47,46 @@ export async function Signup(req, res) {
 
 
 
-
-
-
-
-
-
 export const Signin = async (req, res) => {
-    try {
-        const { email, password } = req.body;
+  try {
+    const { email, password } = req.body;
 
-        const admin = await adminModel.findOne({ email }).exec();
-        if (!admin) {
-            return res.status(400).json({ message: "Admin not found" });
-        }
-
-        if (admin.role !== 'admin') {
-            return res.status(403).json({ message: "Access denied. Not an admin" });
-        }
-
-        const isPasswordValid = await bcryptjs.compare(password, admin.password);
-        if (!isPasswordValid) {
-            return res.status(400).json({ message: "Invalid password" });
-        }
-
-      
-        const token = adminToken(admin);
-          
-        
-      
-       
-        res.cookie("token" , token, { httpOnly: true, maxAge: 86400000 });
-
-        const { userId, username, email: adminEmail, role } = admin;
-        return res.status(200).json({
-            
-            token,
-            user: { _id, username, email: adminEmail, role },
-        });
-
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: "Something went wrong", error: error.message });
+    // Check if admin exists
+    const admin = await adminModel.findOne({ email }).exec();
+    if (!admin) {
+        return res.status(400).json({ message: "Admin not found" });
     }
+
+    // Check if the user is an admin
+    if (admin.role !== 'admin') {
+        return res.status(403).json({ message: "Access denied. Not an admin" });
+    }
+
+    // Validate password
+    const isPasswordValid = await bcryptjs.compare(password, admin.password);
+    if (!isPasswordValid) {
+        return res.status(401).json({ message: "Invalid password" });
+    }
+
+    // Generate JWT token
+    const token = adminToken(admin);
+    res.cookie("token", token, { httpOnly: true, maxAge: 86400000 }); // 1 day
+
+    // Extract admin details
+    const userId = admin._id;
+    const { username, email: adminEmail, role } = admin;
+
+    // Send response
+    return res.status(200).json({
+        message: "Login successful",
+        token,
+        user: { userId, username, email: adminEmail, role },
+    });
+
+} catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Something went wrong", error: error.message });
+}
 };
 
 

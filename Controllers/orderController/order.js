@@ -238,6 +238,23 @@ const getOrders = async (req, res) => {
   }
 };
 
+const orderview=async(req,res)=>{
+
+    const { userId } = req.params;
+  
+    try {
+      const orders = await Order.find({ user: userId }).populate('items.productId', 'name description price');
+  
+      if (!orders || orders.length === 0) {
+        return res.status(404).json({ error: 'No orders found for this user' });
+      }
+  
+      res.status(200).json(orders);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  }
 
 
 
@@ -385,5 +402,5 @@ const orderReturnView=async(req,res)=>{
 
 
 
-const OrderController={addOrder,verify,getOrder,getOrders,updateOrderstatus,orderReturnView,requestsResponse}
+const OrderController={addOrder,verify,getOrder,getOrders,orderview,updateOrderstatus,orderReturnView,requestsResponse}
 export default OrderController

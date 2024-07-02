@@ -70,32 +70,32 @@ export async function Signin(req, res) {
         const { email, password } = req.body;
         console.log("Received Email:", email);
 
+        // Check if the user exists in the database
         const userExist = await userModel.findOne({ email });
         if (!userExist) {
             console.log("User does not exist");
             return res.status(404).json({ message: "User does not exist" });
         }
 
+        // Compare the provided password with the hashed password in the database
         const matchPassword = await bcryptjs.compare(password, userExist.password);
         if (!matchPassword) {
             console.log("Password is not correct");
             return res.status(401).json({ message: "Password is not correct" });
         }
 
-        const token = generateToken(email);
+    
+        const token = generateToken(email); 
         console.log("Generated Token:", token);
+
         
+        res.cookie("token", token, { httpOnly: true });
 
         const userId = userExist._id;
         console.log("User ID:", userId);
-        res.cookie("token", token, { httpOnly: true });
 
         
-        const responseBody = { test: "This is a test response", token };
-        console.log("Response Body:", responseBody);
-
-    
-        res.status(200).json(responseBody);
+        res.status(200).json({ message: "Login successful", userId });
 
     } catch (error) {
         console.error("Server error:", error);
