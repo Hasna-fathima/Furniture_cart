@@ -11,11 +11,9 @@ dotenv.config()
 const app = express();
 
 
-
-
 const port = process.env.PORT
-app.use(express.json());
 app.use(cors());
+app.use(express.json());
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/api/user',userRouter)
