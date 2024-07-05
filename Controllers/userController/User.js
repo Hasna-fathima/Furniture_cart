@@ -69,21 +69,16 @@ export async function Signin(req, res) {
     try {
         const { email, password } = req.body;
         console.log("Received Email:", email);
-
-        // Check if the user exists in the database
         const userExist = await userModel.findOne({ email });
         if (!userExist) {
             console.log("User does not exist");
             return res.status(404).json({ message: "User does not exist" });
         }
-
-        // Compare the provided password with the hashed password in the database
         const matchPassword = await bcryptjs.compare(password, userExist.password);
         if (!matchPassword) {
             console.log("Password is not correct");
             return res.status(401).json({ message: "Password is not correct" });
         }
-
     
         const token = generateToken(email); 
         console.log("Generated Token:", token);

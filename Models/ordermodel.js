@@ -1,7 +1,8 @@
 import  mongoose from  'mongoose';
 import Product from '../Models/prodectmodel.js';
-import { Address } from '../Models/Address.js';
-import userModel from '../Models/Usermodel.js';
+import { Address} from './Address.js';
+import userModel from './Usermodel.js';
+import Return from './return.js';
 
 
 const orderSchema = new mongoose.Schema(
@@ -59,16 +60,17 @@ const orderSchema = new mongoose.Schema(
         date: {
           type: Date,
         },
+       
         isCompleted: {
           type: Boolean,
           default: false,
         },
+        
       },
     ],
   },
   { timestamps: true }
 );
-
 
 const Order= mongoose.model("Order", orderSchema);
 export default Order

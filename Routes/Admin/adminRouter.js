@@ -63,11 +63,11 @@ adminRouter.delete('/deleteCate/:id',categoryController.deletecategoryById)
 adminRouter.get('/Orders',OrderController.getOrders)
 adminRouter.post('/order',OrderController.addOrder)
 adminRouter.put('/updateOrderStatus/:orderId',OrderController.updateOrderstatus)
-adminRouter.get('/returnView',OrderController.orderReturnView)
-adminRouter.get('/acceptReturn/:id/:odrId',OrderController.requestsResponse)
+adminRouter.get('/order/retun',OrderController.requestsResponse)
 adminRouter.get('/order/:userId',OrderController.orderview)
 
 
+  
 
 
               //------------UserAdrres------------//
@@ -77,7 +77,6 @@ adminRouter.post('/address',AddressController.createUserAddress)
 adminRouter.get('/address/:userId',AddressController.getUserAddressById)
 adminRouter.put('/address',AddressController.updateUserAddressById)
 adminRouter.delete('/address/:id',AddressController.deleteUserAddressById)
-
 
 
                        //----Dashbord------//
@@ -96,8 +95,6 @@ adminRouter.get('/offers/:Id',Offers.getOfferbyId)
 adminRouter.post('/offers',upload.single('image'),Offers.createoffers)
 adminRouter.put('/offers/:id',upload.single('image'),Offers.editOfferbyId)
 adminRouter.delete('/offers/:id',Offers.deleteOffer)
-
-
 
 
                        //-----------Cart---------//

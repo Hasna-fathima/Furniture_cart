@@ -8,10 +8,11 @@ import Product from '../../Models/prodectmodel.js';
 import {Address} from '../../Models/Address.js'
 import Paymentmodel from '../../Models/Paymentmodel.js';
 import mongoose from 'mongoose'
+import Return from '../../Models/return.js';
 
 dotenv.config();
 
-const client = Twilio(process.env.ACCOUNT_SID, process.env.AUTH_TOKEN);
+
 
 
 
@@ -243,7 +244,7 @@ const orderview=async(req,res)=>{
     const { userId } = req.params;
   
     try {
-      const orders = await Order.find({ user: userId }).populate('items.productId', 'name description price');
+      const orders = await Order.find({ user: userId }).populate('items.productId', 'name description price imagePublicId');
   
       if (!orders || orders.length === 0) {
         return res.status(404).json({ error: 'No orders found for this user' });
@@ -314,7 +315,7 @@ const updateOrderstatus= async (req, res) => {
 const getOrder = async (req, res) => {
   try {
     const order = await Order.findOne({ _id: req.body.orderId })
-      .populate("items.productId", "_id name productPictures")
+      .populate("items.productId", "_id")
       .lean()
       .exec();
 
@@ -336,71 +337,109 @@ const getOrder = async (req, res) => {
 
 
 
-const orderReturnView=async(req,res)=>{
+const orderReturn = async (req, res) => {
+  const { userid, orderid, productid, reason } = req.body;
+  console.log('Request body:', req.body);
+
   try {
-    const { status } = req.query; // Get the status from query parameters
+    if (!userid || !orderid || !productid || !reason) {
+      return res.status(400).json({ message: 'User ID, Order ID, Product ID, and Reason are required' });
+    }
+    const [user, order, product] = await Promise.all([
+      userModel.findById(userid).exec(),
+      Order.findById(orderid).exec(),
+      Product.findById(productid).exec()
+    ]);
 
-    // Fetch all return requests with the specified order status
-    const returnRequests = await Return.find()
-        .populate('userid', 'name email') // Adjust fields as per your User schema
-        .populate('orderid', 'totalAmount orderStatus') // Adjust fields as per your Order schema
-        .populate('productid', 'name price'); // Adjust fields as per your Product schema
+    if (!user || !order || !product) {
+      return res.status(404).json({ message: 'User, order, or product not found' });
+    }
+    const newReturnRequest = new Return({
+      userid,
+      orderid,
+      productid,
+      reason:reason ||'',
+      status: 'requested'
+    });
+    const savedReturnRequest = await newReturnRequest.save();
 
-    // Filter return requests based on order status
-    const filteredReturns = returnRequests.filter(returnRequest => 
-        returnRequest.orderid.orderStatus === status
-    );
-
-    res.status(200).json(filteredReturns);
-} catch (error) {
-    console.error('Error fetching return requests:', error);
-    res.status(500).json({ message: 'Internal Server Error' });
-}
+    await savedReturnRequest
+      .populate('userid', '_id name email')
+      .populate('productid', '_id name')
+      .execPopulate();
+    const response = {
+      message: 'Return request submitted successfully',
+      return: {
+        _id: savedReturnRequest._id,
+        userid: {
+          _id: user.toObject()._id,
+          details: {
+            name: user.toObject().name,
+            email: user.toObject().email
+          }
+        },
+        orderid: {
+          _id: order.toObject()._id,
+          details: {}
+        },
+        productid: {
+          _id: product.toObject()._id,
+          details: {
+            name: product.toObject().name
+          }
+        },
+        reason: savedReturnRequest.reason,
+        status: savedReturnRequest.status,
+        createdAt: savedReturnRequest.createdAt,
+        updatedAt: savedReturnRequest.updatedAt
+      }
+    };
+    
+    res.status(201).json(response);
+  } catch (error) {
+  
+    console.error('Error requesting return:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
 };
 
 
 
 
 
-
-
-
-
  const requestsResponse=async(req,res)=>{
-  try{
-    const orderId=req.params.orderId
-    const status=req.body.status;
-    const Order=await Order.findById(orderId).populate('user')
-      if(!Order){
-        return res.status(404).json('order not found')
-    }
-   
-     //retrieve the mobilenumber form usermodel
+  try {
+    const returns = await Return.find()
+      .populate('userid', '_id name email')
+      .populate('orderid', '_id')
+      .populate('productid', '_id name')
+      .exec();
 
+    res.status(200).json({
+      message: 'All return requests retrieved successfully',
+      returns: returns.map(returnRequest => ({
+        _id: returnRequest._id,
+        userid: {
+          _id: returnRequest.userid._id,
+    
+        },
+        orderid: returnRequest.orderid._id,
+        productid: {
+          _id: returnRequest.productid._id,
+        
+        },
+        reason: returnRequest.reason,
+        status: returnRequest.status,
+        returnDate: returnRequest.returnDate,
+        createdAt: returnRequest.createdAt,
+        updatedAt: returnRequest.updatedAt
+      }))
+    });
+  } catch (error) {
+    console.error('Error retrieving returns:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
 
-     const user=await usermodel.findById(Order.user._id);
-     const mobileNumber=user.mobileNumber
-
-
-     const message=`youre return request for order ${orderId} has been ${status}`;
-     await client.messages.create({
-      body:message,
-      to:mobileNumber,
-      from:+19378844980
-     })
-     console.log(`sms notification sent to ${mobileNumber}: return request ${status}`)
-    }catch(error){
-      res.status(500).json({error:'an error occured while sending sms '})
-  
-    }
-  };
-
-
-
-
-
-
-
-
-const OrderController={addOrder,verify,getOrder,getOrders,orderview,updateOrderstatus,orderReturnView,requestsResponse}
+const OrderController={addOrder,verify,getOrder,getOrders,orderview,updateOrderstatus,orderReturn,requestsResponse}
 export default OrderController

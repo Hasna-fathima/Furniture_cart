@@ -75,10 +75,12 @@ userRouter.get('/offers/:Id',Offers.getOfferbyId)
 userRouter.get('/order', OrderController.getOrders);
 userRouter.get('/order', OrderController.getOrder)
 userRouter.post('/order',OrderController.addOrder)
-userRouter.get('/acceptReturn/:id/:odrId',OrderController.requestsResponse)
 userRouter.post('/razorpay/verify',OrderController.verify)
+userRouter.get('/order/:userId',OrderController.orderview)
+userRouter.post('/return',OrderController.orderReturn)
+
+
 
 
 
 export default userRouter
-
