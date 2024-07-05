@@ -11,18 +11,17 @@ dotenv.config()
 const app = express();
 
 
-//const corsOptions={
-  //origin:[`https://ecommercecommerce.vercel.app/`,`https://furniturecartfrondend.netlify.app,`],
-  //optionsSuccessStatus:200,
-  //Credentials:true
+const corsOptions={
+  origin:[`http://localhost:5173/`,`https://ecommercecommerce.vercel.app/`],
+  optionsSuccessStatus:200,
+  Credentials:true
  
-//}
-
+}
 
 
 const port = process.env.PORT
 app.use(express.json());
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/api/user',userRouter)
