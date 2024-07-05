@@ -7,8 +7,6 @@ import adminRouter from '../Routes/Admin/adminRouter.js';
 import bodyParser from 'body-parser';
 import dotenv from 'dotenv'
 
-
-
 const app = express();
 const port = process.env.PORT
 app.use(cors());

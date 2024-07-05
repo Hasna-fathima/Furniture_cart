@@ -1,5 +1,6 @@
 import { cloudinaryInstance } from '../../config/Cloudinary.js';
-import Product from '../../Models/prodectmodel.js'
+import Product from '../../Models/prodectmodel.js';
+import mongoose from 'mongoose';
 
 
  const uploadImageToCloudinary = async (filePath) => {
@@ -17,9 +18,6 @@ import Product from '../../Models/prodectmodel.js'
     throw new Error('Failed to upload image to Cloudinary');
   }
 };
-
-
-
 
 
 
@@ -59,9 +57,6 @@ import Product from '../../Models/prodectmodel.js'
     res.status(500).json({ error: 'Internal server error' });
   }
 };
-
-
-
 
 
 
@@ -144,12 +139,8 @@ const updateProduct = async (req, res) => {
 
 const getProductById=async(req,res)=>{
   const {Id}=req.params;
-  Id=Id.trim()
-  if(!mongoose.Types.objectId.isValid(Id)){
-    return res.status(400).send('invalid product id')}
-  
     try {
-      
+    
         const product = await Product.findById(Id);
         if (!product) {
             return res.status(404).send('product not found');
@@ -159,6 +150,7 @@ const getProductById=async(req,res)=>{
         res.status(500).send(err);
     }
 }
+
 
  const getProductsByCategoryOrPrice = async (req, res) => {
   try {
