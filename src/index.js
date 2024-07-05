@@ -7,12 +7,12 @@ import adminRouter from '../Routes/Admin/adminRouter.js';
 import bodyParser from 'body-parser';
 import dotenv from 'dotenv'
 
-dotenv.config()
+
+
 const app = express();
-
-
 const port = process.env.PORT
 app.use(cors());
+dotenv.config()
 app.use(express.json());
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
