@@ -52,7 +52,7 @@ userRouter.delete('/cart',CartController.deleteCartItem);
             //--------Address--------//
 
 
-userRouter.post('/address',passport.authenticate('jwt', { session: false }),AddressController.createUserAddress)
+userRouter.post('/address',AddressController.createUserAddress)
 userRouter.get('/address/:userId',AddressController.getUserAddressById)
 userRouter.put('/address',AddressController.updateUserAddressById)
 
