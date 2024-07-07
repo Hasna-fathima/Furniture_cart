@@ -1,20 +1,14 @@
 import crypto from 'crypto';
 import Razorpay from 'razorpay';
 import dotenv from 'dotenv';
-import Twilio from 'twilio';
 import userModel from '../../Models/Usermodel.js';
 import Order from '../../Models/ordermodel.js';
 import Product from '../../Models/prodectmodel.js';
 import {Address} from '../../Models/Address.js'
-import Paymentmodel from '../../Models/Paymentmodel.js';
 import mongoose from 'mongoose'
 import Return from '../../Models/return.js';
 
 dotenv.config();
-
-
-
-
 
 
 
@@ -27,7 +21,7 @@ export const addOrder = async (req, res) => {
   const { userId, addressId, products } = req.body;
 
   try {
-    // Fetch user and address details
+    
     const user = await userModel.findById(userId);
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
@@ -38,7 +32,6 @@ export const addOrder = async (req, res) => {
       return res.status(404).json({ error: 'Address not found' });
     }
 
-    // Fetch product details for each product in the order
     const orderProducts = await Promise.all(products.map(async (product) => {
       const productDoc = await Product.findById(product.productId);
       if (!productDoc) {
@@ -280,7 +273,7 @@ const updateOrderstatus= async (req, res) => {
       return res.status(400).json({ error: 'Invalid status value' });
     }
 
-    // Find the status object to update
+    
     let foundStatus = false;
     order.orderStatus.forEach(statusObj => {
       if (statusObj.type === status) {
@@ -288,12 +281,12 @@ const updateOrderstatus= async (req, res) => {
         statusObj.date = new Date();
         foundStatus = true;
       } else {
-        statusObj.isCompleted = false; // Set other statuses to false if needed
+        statusObj.isCompleted = false
       }
     });
 
     if (!foundStatus) {
-      // If status not found, add it as a new status object in the array
+      
       order.orderStatus.push({
         type: status,
         date: new Date(),
@@ -405,29 +398,34 @@ const orderReturn = async (req, res) => {
 
 
 
-
-
- const requestsResponse=async(req,res)=>{
+  
+const requestsResponse = async (req, res) => {
   try {
     const returns = await Return.find()
       .populate('userid', '_id name email')
       .populate('orderid', '_id')
-      .populate('productid', '_id name')
+      .populate('productid', '_id name price')
       .exec();
 
     res.status(200).json({
       message: 'All return requests retrieved successfully',
       returns: returns.map(returnRequest => ({
         _id: returnRequest._id,
-        userid: {
-          _id: returnRequest.userid._id,
-    
-        },
-        orderid: returnRequest.orderid._id,
-        productid: {
-          _id: returnRequest.productid._id,
-        
-        },
+        userid: returnRequest.userid
+          ? {
+              _id: returnRequest.userid._id,
+              name: returnRequest.userid.name,
+              email: returnRequest.userid.email
+            }
+          : null,
+        orderid: returnRequest.orderid ? returnRequest.orderid._id : null,
+        productid: returnRequest.productid
+          ? {
+              _id: returnRequest.productid._id,
+              name: returnRequest.productid.name,
+              price:returnRequest.productid.price
+            }
+          : null,
         reason: returnRequest.reason,
         status: returnRequest.status,
         returnDate: returnRequest.returnDate,
@@ -440,6 +438,7 @@ const orderReturn = async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 };
+
 
 const OrderController={addOrder,verify,getOrder,getOrders,orderview,updateOrderstatus,orderReturn,requestsResponse}
 export default OrderController

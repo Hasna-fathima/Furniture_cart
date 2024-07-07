@@ -6,7 +6,6 @@ import Offers from '../../Controllers/offerController/offer.js';
 import AddressController from '../../Controllers/addressController/userAddress.js';
 import CartController from '../../Controllers/cartController/cart.js';
 import OrderController from '../../Controllers/orderController/order.js'
-import { authenticateUser, requireSignin } from '../../Middleware/auth.js';
 import returncontroller from '../../Controllers/return/return.js';
 import passport from '../../Middleware/passport.js'
 
@@ -41,13 +40,11 @@ userRouter.post('/message', usermessage)
 
          //------cart-------//
           
-userRouter.post('/addcart/:userId',passport.authenticate('jwt', { session: false }),CartController.addCart);
+userRouter.post('/addcart/:userId',CartController.addCart);
 userRouter.patch('/cart/:cartId',CartController.editcart);
 userRouter.get('/cart/:userId',CartController.getCartByUser);
 userRouter.get('/cart',CartController.viewCart)
 userRouter.delete('/cart',CartController.deleteCartItem);
-
-
 
             //--------Address--------//
 
@@ -62,11 +59,8 @@ userRouter.post('/return',returncontroller.Returnorder)
 
          //-----Offers-----------//
 
-
 userRouter.get('/offers',Offers.getAlloffers);
 userRouter.get('/offers/:Id',Offers.getOfferbyId)
-
-
 
 
          // ---order----//
@@ -78,9 +72,6 @@ userRouter.post('/order',OrderController.addOrder)
 userRouter.post('/razorpay/verify',OrderController.verify)
 userRouter.get('/order/:userId',OrderController.orderview)
 userRouter.post('/return',OrderController.orderReturn)
-
-
-
 
 
 export default userRouter

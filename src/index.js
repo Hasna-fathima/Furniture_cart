@@ -8,8 +8,12 @@ import bodyParser from 'body-parser';
 import dotenv from 'dotenv'
 
 const app = express();
+const corsOptions={
+  origin:`https://ecommercecommerce.vercel.app`,
+  optionsSuccessStatus:200
+}
 const port = process.env.PORT
-app.use(cors());
+app.use(cors(corsOptions));
 dotenv.config()
 app.use(express.json());
 app.use(cookieParser());

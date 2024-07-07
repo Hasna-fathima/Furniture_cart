@@ -63,13 +63,11 @@ adminRouter.delete('/deleteCate/:id',categoryController.deletecategoryById)
 adminRouter.get('/Orders',OrderController.getOrders)
 adminRouter.post('/order',OrderController.addOrder)
 adminRouter.put('/updateOrderStatus/:orderId',OrderController.updateOrderstatus)
-adminRouter.get('/order/retun',OrderController.requestsResponse)
+adminRouter.get('/order/return',OrderController.requestsResponse)
 adminRouter.get('/order/:userId',OrderController.orderview)
 
 
   
-
-
               //------------UserAdrres------------//
 
 adminRouter.get('/address',AddressController.getAllUserAddresses)
