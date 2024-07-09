@@ -51,32 +51,25 @@ export const Signin = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Check if admin exists
     const admin = await adminModel.findOne({ email }).exec();
     if (!admin) {
         return res.status(400).json({ message: "Admin not found" });
     }
-
-    // Check if the user is an admin
     if (admin.role !== 'admin') {
         return res.status(403).json({ message: "Access denied. Not an admin" });
     }
 
-    // Validate password
     const isPasswordValid = await bcryptjs.compare(password, admin.password);
     if (!isPasswordValid) {
         return res.status(401).json({ message: "Invalid password" });
     }
 
-    // Generate JWT token
     const token = adminToken(admin);
-    res.cookie("token", token, { httpOnly: true, maxAge: 86400000 }); // 1 day
-
-    // Extract admin details
+    res.cookie("token", token, { httpOnly: true, maxAge: 86400000 }); 
     const _id = admin._id;
     const { username, email: adminEmail, role } = admin;
 
-    // Send response
+  
     return res.status(200).json({
         message: "Login successful",
         token,
@@ -270,8 +263,7 @@ export const Signout=(req, res)=> {
               }
             }
           ]);
-      
-          // If there are no orders, return 0 as total sales
+    
           const totalAmount = totalSales.length > 0 ? totalSales[0].totalAmount : 0;
       
           res.json({ totalSales: totalAmount });
@@ -293,7 +285,14 @@ export const Signout=(req, res)=> {
         }
       };
 
-      const adminController={getAllusers,getOrderCountsPerDay,getOrderCountsPerMonth,getOrderCountsPerYear,blockedusers,unblockedusers,viewmessage,getTotalSalesReport,getuserbyid,}
+
+
+
+
+      
+ 
+
+      const adminController={getAllusers,createAdmin,getOrderCountsPerDay,getOrderCountsPerMonth,getOrderCountsPerYear,blockedusers,unblockedusers,viewmessage,getTotalSalesReport,getuserbyid,}
       
       export default adminController
 
