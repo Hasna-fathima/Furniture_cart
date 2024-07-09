@@ -292,7 +292,7 @@ export const Signout=(req, res)=> {
       
  
 
-      const adminController={getAllusers,createAdmin,getOrderCountsPerDay,getOrderCountsPerMonth,getOrderCountsPerYear,blockedusers,unblockedusers,viewmessage,getTotalSalesReport,getuserbyid,}
+      const adminController={getAllusers,getOrderCountsPerDay,getOrderCountsPerMonth,getOrderCountsPerYear,blockedusers,unblockedusers,viewmessage,getTotalSalesReport,getuserbyid,}
       
       export default adminController
 
