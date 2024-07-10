@@ -6,27 +6,25 @@ import userRouter from '../Routes/user/userRouter.js';
 import adminRouter from '../Routes/Admin/adminRouter.js';
 import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
-import path from 'path';
+import path from 'path'
+
+
+const corsOptions={
+  origin:'https://ecommercecommerce.vercel.app',
+  optionsSuccessStatus:200
+}
+
 
 dotenv.config();
 const app = express();
 const port = process.env.PORT || 5000;
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
-
-
+app.use('/uploads', express.static(path.join(process.cwd(),'uploads')));
 app.use('/api/user', userRouter);
 app.use('/api/user/admin', adminRouter);
-
-const __dirname = path.resolve();
-app.use(express.static(path.join(__dirname, 'client/build')));
-
-
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'client/build', 'index.html'));
-});
 
 
 connect()

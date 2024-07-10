@@ -1,17 +1,34 @@
-import  Category from '../../Models/Category.js'
+import Category from '../../Models/Category.js'
 
 
-
-const Createcategory = async (req, res) => {
-  try {
-      const { name, slug, parentId, image, createdBy } = req.body;
-      const category = new Category({ name, slug, parentId, image, createdBy });
+  const Createcategory = async (req, res) => {
+    try {
+      console.log('Request body:', req.body);
+      console.log('Uploaded file:', req.file);
+  
+      const { name } = req.body;
+      const image = req.file ? `/uploads/${req.file.filename}` : null;
+  
+      if (!name || !image) {
+        return res.status(400).json({ error: 'Missing required fields' });
+      }
+  
+      const slug = name.toLowerCase().replace(/ /g, '-');
+  
+      const category = new Category({
+        name,
+        slug,
+        image,
+      });
+  
       const savedCategory = await category.save();
       res.status(201).send(savedCategory);
-  } catch (err) {
+    } catch (err) {
+      console.error('Error creating category:', err);
       res.status(400).send(err);
-  }
-};
+    }
+  };
+  
 
     
  const getAllcategory=async(req,res)=>{

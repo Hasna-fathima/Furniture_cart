@@ -8,6 +8,7 @@ import CartController from '../../Controllers/cartController/cart.js';
 import OrderController from '../../Controllers/orderController/order.js'
 import returncontroller from '../../Controllers/return/return.js';
 import passport from '../../Middleware/passport.js'
+import ReviewController from '../../Controllers/Review/review.js';
 
 const userRouter=express.Router();
 
@@ -66,12 +67,18 @@ userRouter.get('/offers/:Id',Offers.getOfferbyId)
          // ---order----//
 
 
-userRouter.get('/order', OrderController.getOrders);
+
 userRouter.get('/order', OrderController.getOrder)
 userRouter.post('/order',OrderController.addOrder)
 userRouter.post('/razorpay/verify',OrderController.verify)
 userRouter.get('/order/:userId',OrderController.orderview)
 userRouter.post('/return',OrderController.orderReturn)
+  
+
+   //-----review-------/
+
+userRouter.post('/review',ReviewController.reviewadd)
+userRouter.get('/review/:productId',ReviewController.getreview)
 
 
 export default userRouter

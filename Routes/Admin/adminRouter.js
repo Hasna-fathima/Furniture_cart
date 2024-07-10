@@ -8,6 +8,7 @@ import OrderController from '../../Controllers/orderController/order.js'
 import {upload} from '../../Middleware/upload.js';
 import CartController from '../../Controllers/cartController/cart.js';
 import adminController from '../../Controllers/admin/adminController.js';
+import ReviewController from '../../Controllers/Review/review.js';
 
 
 
@@ -29,7 +30,8 @@ adminRouter.put('/product/:productId',upload.single('image'),productController.u
 adminRouter.delete('/productdelete/:productId',productController.deleteProductById);
 
 
-
+       //--------review----//
+adminRouter.get('/review/:productId',ReviewController.getreview)
                 
 
 
@@ -51,7 +53,7 @@ adminRouter.get('/messages',adminController.viewmessage)
 
 
 adminRouter.get('/category',categoryController.getAllcategory)
-adminRouter.post('/addCate',categoryController.Createcategory)
+adminRouter.post('/addCate',upload.single('image'),categoryController.Createcategory)
 adminRouter.put('/editCate/:id',categoryController.updatecategory)
 adminRouter.get('/category/:slug',categoryController.getcategorysBySlug)
 adminRouter.delete('/deleteCate/:id',categoryController.deletecategoryById)
