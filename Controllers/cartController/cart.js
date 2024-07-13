@@ -72,17 +72,17 @@ const addCart = async (req, res) => {
         }
     
         const populatedCartItems = cart.cartItems.map(item => {
-          console.log('Product:', item.product); // Log to check the populated product
+          console.log('Product:', item.product); 
           return {
             product: item.product._id,
             quantity: item.quantity,
             name: item.product.name,
-            imagePublicId: item.product.imagePublicId, // Ensure this field exists
+            imagePublicId: item.product.imagePublicId, 
             price: item.product.price,
           };
         });
     
-        console.log('Populated Cart Items:', populatedCartItems); // Log to verify populated items
+        console.log('Populated Cart Items:', populatedCartItems); 
     
         res.json({ cartItems: populatedCartItems, cartId: cart._id });
       } catch (error) {
@@ -120,26 +120,21 @@ const addCart = async (req, res) => {
           return res.status(400).json({ error: 'Missing required fields' });
         }
     
-        // Ensure the cartId is in the correct format (for example, a MongoDB ObjectId)
         if (!mongoose.Types.ObjectId.isValid(cartId)) {
           return res.status(400).json({ error: 'Invalid cart ID format' });
         }
-    
-        // Find the cart by ID
+  
         const cart = await Cart.findById(cartId);
     
         if (!cart) {
           console.log(`Cart not found for cartId: ${cartId}`);
           return res.status(404).json({ error: 'Cart not found' });
         }
-    
-        // Ensure the cart has a cartItems array
+  
         if (!cart.cartItems || !Array.isArray(cart.cartItems)) {
           console.log(`Cart found but it does not contain a cartItems array`);
           return res.status(400).json({ error: 'Cart does not contain a cartItems array' });
         }
-    
-        // Find the product within the cartItems
         const product = cart.cartItems.find(item => item.product.toString() === productId);
     
         if (!product) {
@@ -147,10 +142,8 @@ const addCart = async (req, res) => {
           return res.status(404).json({ error: 'Product not found in cart' });
         }
     
-        // Update product quantity
         product.quantity = quantity;
-    
-        // Save the updated cart
+  
         const updatedCart = await cart.save();
         res.json(updatedCart);
       } catch (error) {

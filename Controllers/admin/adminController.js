@@ -65,7 +65,7 @@ export const Signin = async (req, res) => {
     }
 
     const token = adminToken(admin);
-    res.cookie("token", token, { httpOnly: true, maxAge: 86400000 }); 
+    res.cookie("token", token, { httpOnly: true }); 
     const _id = admin._id;
     const { username, email: adminEmail, role } = admin;
 
@@ -231,7 +231,7 @@ export const Signout=(req, res)=> {
                 totalOrders: { $sum: 1 }
               }
             },
-            { $sort: { "_id.year": 1 } } // Sort by year
+            { $sort: { "_id.year": 1 } }
           ]);
       
         

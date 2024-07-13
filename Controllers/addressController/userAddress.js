@@ -60,8 +60,6 @@ const updateUserAddressById = async (req, res) => {
     if (!addressToUpdate) {
       return res.status(404).json({ error: 'Address not found' });
     }
-
-    // Update specific fields of the address
     for (const key in updates) {
       addressToUpdate[key] = updates[key];
     }

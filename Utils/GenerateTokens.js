@@ -23,6 +23,6 @@ export const adminToken = (admin) => {
         process.env.SECRET_KEY, 
         { expiresIn: "1d" }
     );
-    console.log("Generated Token:", token); // Log generated token
+    console.log("Generated Token:", token); 
     return token;
 };
